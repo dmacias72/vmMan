@@ -1,5 +1,5 @@
 <?php
-  // error_reporting(0);
+   error_reporting(0);
    require('/usr/local/emhttp/plugins/vmMan/classes/libvirt.php');
    require('/usr/local/emhttp/plugins/vmMan/classes/language.php');
 	$uri = 'qemu:///system';
