@@ -1,12 +1,7 @@
-<div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	<h4 class="modal-title" id="host_info"><img src="/plugins/webGui/images/logo.png" class="icon" ></h4>
-</div>
-<div class="modal-body">
-	<div class="wrap">
-		<div class="list">
-			<?php
-			   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
+<div class="wrap">
+	<div class="list">
+		<?php
+		   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
  
 			$tmp = $lv->host_get_node_info();
 			$ci  = $lv->get_connect_information();
@@ -24,7 +19,7 @@
     		if (strlen($info) > 2)
       		$info[ strlen($info) - 2 ] = ' ';
 
-			echo "
+			echo "<h3>Host Information</h3>
    	      <table class='table table-striped'>
 	      	  	<tr>
 		  	        	<td>Hypervisor: </td>
@@ -69,9 +64,7 @@
        		</table>
 				";
 
-  	  			unset($tmp);
-			?>
-		</div>
+  			unset($tmp);
+		?>
 	</div>
 </div>
-<div class="modal-footer"> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div>

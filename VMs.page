@@ -1,0 +1,31 @@
+Cond="(pgrep('libvirtd')!==FALSE)"
+Icon="icons/default.png"
+Menu="Tasks:70"
+Type="xmenu"
+---
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="/plugins/vmMan/bootstrap/css/bootstrap.css" rel="stylesheet">
+<link href="/plugins/vendor/normalize/normalize.css" rel="stylesheet" type="text/css"></link>
+<link href="/plugins/webGui/style/default_layout.css" rel="stylesheet" type="text/css"></link>
+</head>
+
+<?php
+   $vmpage = array_key_exists('vmpage', $_GET) ? $_GET['vmpage'] : '';
+	if($vmpage == 'addxml')
+		include_once('/usr/local/emhttp/plugins/vmMan/addxml.php');
+	if($vmpage == 'editxml')
+		include_once('/usr/local/emhttp/plugins/vmMan/editxml.php');
+	elseif($vmpage == 'dominfo')
+		include_once('/usr/local/emhttp/plugins/vmMan/dominfo.php');
+	elseif($vmpage == 'networks')
+		include_once('/usr/local/emhttp/plugins/vmMan/networks.php');
+	elseif($vmpage == 'nodes')
+		include_once('/usr/local/emhttp/plugins/vmMan/nodes.php');
+	elseif ($vmpage == 'storage')
+		include_once('/usr/local/emhttp/plugins/vmMan/storage.php');
+	elseif ($vmpage == 'hostinfo')
+		include_once('/usr/local/emhttp/plugins/vmMan/hostinfo.php');
+	else
+		include_once('/usr/local/emhttp/plugins/vmMan/main.php');
+?>

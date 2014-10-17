@@ -1,8 +1,3 @@
-<div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	<h4 class="modal-title" id="networks"><img src="/plugins/webGui/icons/network.png" class="icon" width="16" height="16">Network information</h4>
-</div>
-<div class="modal-body">
 	<div class="wrap">
 		<div class="list">
 			<?php
@@ -34,16 +29,17 @@
 
 				$tmp = $lv->get_networks(VIR_NETWORKS_ALL);
 
-				echo "<table class='table table-striped'>
- 	        <tr>
-   	      	<th> Network name </th>
-      	      <th> Network state </th>
-         	   <th> Gateway IP Address </th>
-         	   <th> IP Address Range </th>
-        		   <th> Forwarding </th>
-         	   <th> DHCP Range </th>
-           		<th> Actions </th>
-				</tr>";
+				echo "<h3>Network Information</h3>
+					<table class='table table-striped'>
+ 	        			<tr>
+   	      			<th> Network name </th>
+	      	      <th> Network state </th>
+   	      	   <th> Gateway IP Address </th>
+      	   	   <th> IP Address Range </th>
+        			   <th> Forwarding </th>
+         		   <th> DHCP Range </th>
+           			<th> Actions </th>
+					</tr>";
 
 				for ($i = 0; $i < sizeof($tmp); $i++) {
 					$tmp2 = $lv->get_network_information($tmp[$i]);
@@ -81,7 +77,3 @@
 			?>
 		</div>
 	</div>
-</div>
-<div class="modal-footer">
-	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-</div>

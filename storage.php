@@ -1,23 +1,19 @@
-<div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	<h4 class="modal-title" id="storage"><img src="/plugins/webGui/icons/array_status.png" class="icon" width="16" height="16">Storage information</h4>
-</div>
-<div class="modal-body">
 	<div class="wrap">
 		<div class="list">
 			<?php
 			   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
-				echo "<table class=\"table table-striped\">";
-				echo "<tr>
-					<th>Name<th>
-					<th>Activity</th>
-					<th>Volume count</th>
-					<th>State</th>
-					<th>Capacity</th>
-					<th>Allocation</th>
-					<th>Available</th>
-					<th>Path</th>
-					<th>Actions</th>
+				echo "<h3>Storage Pool Information</h3>
+				<table class=\"table table-striped\">
+					<tr>
+						<th>Name<th>
+						<th>Activity</th>
+						<th>Volume count</th>
+						<th>State</th>
+						<th>Capacity</th>
+						<th>Allocation</th>
+						<th>Available</th>
+						<th>Path</th>
+						<th>Actions</th>
 		      	</tr>";
 	
 				$pools = $lv->get_storagepools();
@@ -70,7 +66,3 @@
 			?>
 		</div>
 	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	</div>
-</div>
