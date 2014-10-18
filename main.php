@@ -2,8 +2,15 @@
 	<div class="list">
 		
 <?php
-   $ret = false;
-   $clrh = false;
+if (!$lv->get_domains())
+	echo "<h3>No Domains Defined.  Create from template or Add XML description.</h3>";
+else {
+	$ret = false;
+	$clrh = false;
+   $doms = $lv->get_domains;
+   $domkeys = array_keys($doms);
+  	$tmp = $lv->get_domain_count();
+   $active = $tmp['active'];
    if ($action) {
      	$domName = $lv->domain_get_name_by_uuid($uuid);
       if ($action == 'domain-start') {
@@ -75,12 +82,11 @@
             }
 			}
 		}
-	$tmp = $lv->get_domain_count();
 	echo "<div class=\"wrap\">
 				<div class=\"list\">
 					<h3>Virtual Machine Information</h3>			
 					<table class=\"table table-striped\">
-						<p>Statistics - {$tmp['total']} domains, {$tmp['active']} active, {$tmp['inactive']} inactive</p>
+						<p>Statistics - {$tmp['total']} domains, {$active} active, {$tmp['inactive']} inactive</p>
   	      			<tr>
   		          		<th>Name</th>
    	         	   <th>CPU#</th>
@@ -93,9 +99,6 @@
               			<th>Auto</th>
               			<th>Action</th>
             		</tr>";
-	$doms = $lv->get_domains();
-   $domkeys = array_keys($doms);
-   $active = $tmp['active'];
 	//Get domain variables for each domain
    for ($i = 0; $i < sizeof($doms); $i++) {
    	$name = $doms[$i];
@@ -180,6 +183,7 @@
 			echo $ret;
 	echo "</div>";
 	if ($clrh) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs'); </script>";
+} 
 ?>
 	</div>
 </div>
