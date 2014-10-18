@@ -1,7 +1,6 @@
 <div class="wrap">
   	<div class="list">
      	<?php
-	   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
       $subaction = array_key_exists('subaction', $_GET) ? $_GET['subaction'] : false;
       $msg = false;
       $domName = $lv->domain_get_name_by_uuid($_GET['uuid']);

@@ -1,8 +1,5 @@
 <div class="wrap">
 	<div class="list">
-		<?php
-		   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
-	?>
 	<h3>View XML Description</h3>
 		<div>
 			<form method="POST" id="viewXML">

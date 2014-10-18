@@ -1,7 +1,6 @@
 	<div class="wrap">
 		<div class="list">
 			<?php
-			   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
   		if ($subaction == 'volume-delete') {
 				$lv->storagevolume_delete( base64_decode($_GET['vpath']) ) ? 
 				$msg = 'Volume has been deleted successfully' : 
@@ -35,7 +34,7 @@
   	  	      	      <td>{$lv->format_size($info['allocation'], 2)}</td>
   		 	      	   <td>{$lv->format_size($info['available'], 2)}</td>
 							<td>{$info['path']}</td>
-							<td><a href=\"?page=storage&amp;pool={$pools[$i]}&amp;subaction=volume-create\"><i class=\"glyphicon glyphicon-plus green\"></a></td>
+							<td><a href=\"?vmpage=storage&amp;pool={$pools[$i]}&amp;subaction=volume-create\"><i class=\"glyphicon glyphicon-plus green\"></a></td>
   	       	      </tr>";
 	
 					if ($info['volume_count'] > 0) {
@@ -52,15 +51,16 @@
 						$tmp = $lv->storagepool_get_volume_information($pools[$i]);
 						$tmp_keys = array_keys($tmp);
 						for ($ii = 0; $ii < sizeof($tmp); $ii++) {
-							$vpath = $tmp[$tmp_keys[$ii]]['path'];
+							$vname = $tmp_keys[$ii];		
+							$vpath = $tmp[$vname]['path'];
 							echo "<tr>
-										<td>{$tmp_keys[$ii]}</td>
-										<td>{$lv->translate_volume_type($tmp[$tmp_keys[$ii]]['type'])}</td>
-										<td>{$lv->format_size($tmp[$tmp_keys[$ii]]['capacity'], 2)}</td>
-										<td>{$lv->format_size($tmp[$tmp_keys[$ii]]['allocation'], 2)}</td>
+										<td>$vname</td>
+										<td>{$lv->translate_volume_type($tmp[$vname]['type'])}</td>
+										<td>{$lv->format_size($tmp[$vname]['capacity'], 2)}</td>
+										<td>{$lv->format_size($tmp[$vname]['allocation'], 2)}</td>
 										<td>$vpath</td>
 										<td><a href=\"?vmpage=storage&amp;vpath=".base64_encode($vpath)."&amp;subaction=volume-delete\" 
-												onclick=\"return confirm('Are your sure?')\"><i class=\"glyphicon glyphicon-remove red\"></i></a></td>
+												onclick=\"return confirm('Are your sure you want to remove $vname?')\"><i class=\"glyphicon glyphicon-remove red\"></i></a></td>
 							      </tr>";
 						}	
 

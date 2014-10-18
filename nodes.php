@@ -1,7 +1,6 @@
 	<div class="wrap">
    	<div class="list">
 			<?php
-			   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
 				$ret = false;
 				if (array_key_exists('subaction', $_GET)) {
 					$name = $_GET['name'];

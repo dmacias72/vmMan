@@ -1,8 +1,6 @@
 <div class="wrap">
 	<div class="list">
 <?php
-  require('/usr/local/emhttp/plugins/vmMan/include.php');
-  
   $skip = false;
   $msg = false;
   if (array_key_exists('sent', $_POST)) {
@@ -44,7 +42,7 @@
 		$msg = $lv->get_last_error();
 	else {
 		$skip = true;
-		$msg = $lang->get('new-vm-created');
+		$msg = "New virtual machine has been created successfully";
 	}
   }
 
@@ -58,7 +56,7 @@
 <?php
     if ($msg):
 ?>
-    <div id="msg"><b><?php echo $lang->get('msg') ?>:&nbsp; </b><?php echo $msg ?></div>
+    <div id="msg"><b>Message:&nbsp; </b><?php echo $msg ?></div>
 <?php
     endif;
 ?>
@@ -111,18 +109,18 @@
 
 <div id="content">
 
-<div class="section"><h3><?php echo $lang->get('create-new-vm') ?> (NOT WORKING YET!)</h3></div>
+<div class="section"><h3>Create a new VM (NOT WORKING YET!)</h3></div>
 
 <form method="POST">
 
 <table id="form-table">
 <tr>
-    <td align="right"><?php echo $lang->get('name') ?>:&nbsp; </td>
+    <td align="right">Name:&nbsp; </td>
     <td><input type="text" name="name" /></td>
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('install-image') ?>:&nbsp; </td>
+    <td align="right">Install image:&nbsp; </td>
     <td>
 		<select name="install_img">
 <?php
@@ -133,7 +131,7 @@
 	</td>
 
 <tr>
-    <td align="right"><?php echo $lang->get('vcpus') ?>:&nbsp; </td>
+    <td align="right">vCPUs:&nbsp; </td>
     <td>
 		<select name="cpu_count">
 <?php
@@ -144,7 +142,7 @@
 </td>
 
 <tr>
-    <td align="right"><?php echo $lang->get('features') ?>:&nbsp;</td>
+    <td align="right">Features:&nbsp;</td>
     <td>
         <input class="checkbox" type="checkbox" value="1" name="feature_apic" checked="checked" /> APIC<br />
         <input class="checkbox" type="checkbox" value="1" name="feature_acpi" checked="checked" /> ACPI<br />
@@ -154,17 +152,17 @@
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('mem') ?> (MiB):&nbsp;</td>
+    <td align="right">Memory (MiB):&nbsp;</td>
     <td><input type="text" name="memory" value="512" /></td>
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('mem_alloc_max') ?> (MiB):&nbsp;</td>
+    <td align="right">Max. allocation (MiB):&nbsp;</td>
     <td><input type="text" name="maxmem" value="512" /></td>
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('clock-offset') ?>:&nbsp;</td>
+    <td align="right">Clock offset:&nbsp;</td>
     <td>
         <select name="clock_offset">
           <option value="utc">UTC</option>
@@ -174,11 +172,11 @@
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('setup').' '.$lang->get('nic') ?>:</td>
+    <td align="right">Setup Network:&nbsp;</td>
     <td>
       <select name="setup_nic" onchange="change_divs('network', this.value)">
-	<option value="0"><?php echo $lang->get('No') ?></option>
-	<option value="1"><?php echo $lang->get('Yes') ?></option>
+	<option value="0">No</option>
+	<option value="1">Yes</option>
       </select>
     </td>
 </tr>
@@ -188,13 +186,13 @@
     <td>
         <table>
             <tr>
-                <td align="right"><?php echo $lang->get('vm_network_mac') ?>:&nbsp;</td>
+                <td align="right">MAC address:&nbsp;</td>
                 <td>
 			<input type="text" name="nic_mac" value="<?php echo $lv->generate_random_mac_addr() ?>" id="nic_mac_addr" />
 		</td>
             </tr>
             <tr>
-                 <td align="right"><?php echo $lang->get('vm_network_type') ?>:&nbsp;</td>
+                 <td align="right">NIC Type:&nbsp;</td>
                  <td>
                      <select name="nic_type">';
 
@@ -207,7 +205,7 @@
                  </td>
             </tr>
             <tr>
-                 <td align="right"><?php echo $lang->get('vm_network_net') ?>:&nbsp;</td>
+                 <td align="right">Network:&nbsp;</td>
                  <td>
                      <select name="nic_net">';
 
@@ -224,11 +222,11 @@
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('setup').' '.$lang->get('disk') ?>:&nbsp;</td>
+    <td align="right">Setup disk:&nbsp;</td>
     <td>
       <select name="setup_disk" onchange="change_divs('disk', this.value)">
-        <option value="0"><?php echo $lang->get('No') ?></option>
-        <option value="1"><?php echo $lang->get('Yes') ?></option>
+        <option value="0">No</option>
+        <option value="1">Yes</option>
       </select>
     </td>
 </tr>
@@ -238,27 +236,27 @@
     <td>
         <table>
             <tr>
-                <td align="right"><?php echo $lang->get('new-vm-disk')?>:&nbsp; </td>
+                <td align="right">VM disk:&nbsp;</td>
                 <td>
 		    <select name="new_vm_disk" onchange="vm_disk_change(this.value)">
-			<option value="0"><?php echo $lang->get('new-vm-existing') ?></option>
-			<option value="1"><?php echo $lang->get('new-vm-create') ?></option>
+			<option value="0">Use existing disk image</option>
+			<option value="1">Create new disk image</option>
 		    </select>
 		</td>
 	    </tr>
             <tr>
 		<td align="right">
 			<span id="vm_disk_existing">
-			<?php echo $lang->get('vm_disk_image')?>:&nbsp;
+			Disk image:&nbsp;
 			</span>
 			<span id="vm_disk_create" style="display: none">
-			<?php echo $lang->get('vm-disk-size') ?> (MiB):&nbsp; 
+			New disk size (GB):&nbsp; 
 			</span>
 		</td>
 		<td><input type="text" name="img_data" /></td>
 	    </tr>
 	    <tr>
-		<td align="right"><?php echo $lang->get('vm_disk_location') ?>:&nbsp; </td>
+		<td align="right">Disk Location:&nbsp; </td>
 		<td>
 		    <select name="disk_bus">
 			<option value="ide">IDE Bus</option>
@@ -267,7 +265,7 @@
 		</td>
 	    </tr>
 	    <tr>
-		<td align="right"><?php echo $lang->get('vm_disk_type') ?>:&nbsp; </td>
+		<td align="right">Driver type:&nbsp;</td>
 		<td>
 		    <select name="disk_driver">
 			<option value="raw">raw</option>
@@ -277,18 +275,18 @@
 		</td>
 	    </tr>
 	    <tr>
-		<td align="right"><?php echo $lang->get('vm_disk_dev') ?>:&nbsp; </td>
+		<td align="right">Domain device:&nbsp;</td>
 		<td>hda</td>
 	    </tr>
 	</table>
     </td>
 </tr>
 <tr>
-	<td align="right"><?php echo $lang->get('persistent') ?>:</td>
+	<td align="right">Set as persistent:&nbsp;</td>
 	<td>
 		<select name="setup_persistent">
-			<option value="0"><?php echo $lang->get('No') ?></option>
-			<option value="1" selected="selected"><?php echo $lang->get('Yes') ?></option>
+			<option value="0">No</option>
+			<option value="1" selected="selected">Yes</option>
 		</select>
 	</td>
 </tr>
@@ -297,7 +295,7 @@
 
 <tr align="right">
     <td colspan="1">
-    <input type="submit" value=" <?php echo $lang->get('create-vm') ?> " />
+    <input type="submit" value="Create VM" />
     </td>
 </tr>
 </table>
@@ -307,7 +305,7 @@
 <?php
   else:
 ?>
-  <br /><a href="?name=<?php echo $_POST['name'] ?>"><?php echo $lang->get('vm_details') ?></a>
+  <br /><a href="?name=<?php echo $_POST['name'] ?>">Machine details</a>
 <?php
   endif;
 ?>

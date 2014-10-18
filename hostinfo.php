@@ -1,8 +1,6 @@
 <div class="wrap">
 	<div class="list">
 		<?php
-		   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
- 
 			$tmp = $lv->host_get_node_info();
 			$ci  = $lv->get_connect_information();
  

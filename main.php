@@ -2,15 +2,26 @@
 	<div class="list">
 		
 <?php
-	require_once('/usr/local/emhttp/plugins/vmMan/include.php');
    $ret = false;
    $clrh = false;
    if ($action) {
      	$domName = $lv->domain_get_name_by_uuid($uuid);
       if ($action == 'domain-start') {
-        	$ret = $lv->domain_start($domName) ? 
-        		"Domain $domName has been successfully started" : 
-        		'Error while starting domain: '.$lv->get_last_error();
+        	$lv->domain_start($domName) ? 
+        		$ret = "Domain $domName has been successfully started" : 
+        		$ret = 'Error while starting domain: '.$lv->get_last_error();
+			$clrh=true; }
+		elseif ($action == 'domain-autostart') {
+			$res = $lv->get_domain_by_name($name);
+	 		if ($lv->domain_get_autostart($res)) {
+	 			$lv->domain_set_autostart($res, false) ?
+	 			$ret = "Domain $name has been successfully removed from autostart" :
+	 			$ret = 'Error while removing domain from autostart: '.$lv->get_last_error();
+	 		}else{
+	 			$lv->domain_set_autostart($res, true) ?  
+       		$ret = "Domain $name has been successfully added to autostart" :
+       		$ret = 'Error while setting domain to autostart: '.$lv->get_last_error(); 
+			}
 			$clrh=true; }
       elseif ($action == 'domain-pause') {
         	$ret = $lv->domain_suspend($domName) ? 
@@ -79,6 +90,7 @@
             	  		<th>System</th>
               			<th>State</th>
               		 	<th>ID / WS Port</th>
+              			<th>Auto</th>
               			<th>Action</th>
             		</tr>";
 	$doms = $lv->get_domains();
@@ -92,6 +104,7 @@
       $dom = $lv->domain_get_info($res);
       $mem = number_format($dom['memory'] / 1024000, 1, '.', ' ').' GB';
       $cpu = $dom['nrVirtCpu'];
+		$achk = $lv->domain_get_autostart($res) ? "checked":"";  
       $state = $lv->domain_state_translate($dom['state']);
 		if ($state == 'running')
 		 	$scolor = 'LimeGreen';
@@ -133,32 +146,33 @@
                <td>$nics</td>
                <td>$arch</td>
                <td><font color=\"$scolor\">$state</font></td>
-               <td>$id / $wsport</td><td>";
+               <td>$id / $wsport</td>
+               <td><input type=\"checkbox\" title=\"Toggle VM auostart\" $achk onClick=\"javascript:location.href='?action=domain-autostart&amp;name=$name'\" ></td><td>";
 				
 		//Domain Action Buttons
       if ($lv->domain_is_running($res, $name)){
-			echo "<button class=\"btn btn-sm btn-primary\" onclick=\"window.open('$vnc','_blank','scrollbars=yes,resizable=yes'); return false;\" 
+			echo "<button class=\"btn btn-sm btn-primary\" onClick=\"window.open('$vnc','_blank','scrollbars=yes,resizable=yes'); return false;\" 
       	  			title=\"open VNC connection\"><i class=\"glyphicon glyphicon-eye-open\"></i></button> | 
-           		<button class=\"btn btn-sm btn-warning\" onclick=\"javascript:location.href='?action=domain-pause&amp;uuid=$uuid'\" 
+           		<button class=\"btn btn-sm btn-warning\" onClick=\"javascript:location.href='?action=domain-pause&amp;uuid=$uuid'\" 
         				title=\"Pause domain\"><i class=\"glyphicon glyphicon-pause\"></i></button> | 
-            	<button class=\"btn btn-sm btn-primary\" onclick=\"javascript:location.href='?action=domain-restart&amp;uuid=$uuid'\" 
+            	<button class=\"btn btn-sm btn-primary\" onClick=\"javascript:location.href='?action=domain-restart&amp;uuid=$uuid'\" 
         				title=\"restart domain\"><i class=\"glyphicon glyphicon-refresh\"></i></button> | 
-        			<button class=\"btn btn-sm btn-danger\" onclick=\"javascript:location.href='?action=domain-stop&amp;uuid=$uuid'\" 
+        			<button class=\"btn btn-sm btn-danger\" onClick=\"javascript:location.href='?action=domain-stop&amp;uuid=$uuid'\" 
         				title=\"safely shutdown domain\"><i class=\"glyphicon glyphicon-stop\"></i></button> | 
               	<a class=\"btn btn-sm btn-default\" href=\"?action=domain-destroy&amp;uuid=$uuid\" 
-              		onclick=\"return confirm('Are your sure?')\" title=\"force domain to shutdown\"><i class=\"glyphicon glyphicon-eject\"></i></a>";
+              		onClick=\"return confirm('Are your sure you want to force $name to shutdown?')\" title=\"force domain to shutdown\"><i class=\"glyphicon glyphicon-eject\"></i></a>";
  		}else {
         	if ($state == "paused")
-        		echo "<button class=\"btn btn-sm btn-success\" onclick=\"javascript:location.href='?action=domain-resume&amp;uuid=$uuid'\" 
+        		echo "<button class=\"btn btn-sm btn-success\" onClick=\"javascript:location.href='?action=domain-resume&amp;uuid=$uuid'\" 
         				title=\"resume domain\"><i class=\"glyphicon glyphicon-play\"></i></button>";
 			else
-        		echo "<button class=\"btn btn-sm btn-success\" onclick=\"javascript:location.href='?action=domain-start&amp;uuid=$uuid'\" 
+        		echo "<button class=\"btn btn-sm btn-success\" onClick=\"javascript:location.href='?action=domain-start&amp;uuid=$uuid'\" 
         				title=\"start domain\"><i class=\"glyphicon glyphicon-play\"></i></button>";
 		}
       if (!$lv->domain_is_running($res, $name))
       	echo " | <a class=\"btn btn-sm btn-danger\" href=\"?vmpage=main&amp;action=domain-undefine&uuid=$uuid\" 
-          		 onclick=\"return confirm('Are your sure?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a>";
-		echo " | <button class=\"btn btn-sm btn-info\" onclick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid'\" 
+          		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a>";
+		echo " | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid'\" 
 		  		title=\"edit domain XML\"><i class=\"glyphicon glyphicon-plus\"></i></button></td></tr>";
 	}
 	echo "</table>";

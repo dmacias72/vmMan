@@ -1,24 +1,23 @@
 	<div class="wrap">
 		<div class="list">
 			<?php
-			   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
 				$ret = false;
 				if ($subaction) {
    	  	    	$name = $_GET['name'];
 					if ($subaction == 'start'){
-         	      $ret = $lv->set_network_active($name, true) ? "Network has been started successfully" : 'Error while starting network: '.$lv->get_last_error();
+         	      $msg = $lv->set_network_active($name, true) ? "Network has been started successfully" : 'Error while starting network: '.$lv->get_last_error();
 					} elseif ($subaction == 'stop'){
-						$ret = $lv->set_network_active($name, false) ? "Network has been stopped successfully" : 'Error while stopping network: '.$lv->get_last_error();
+						$msg = $lv->set_network_active($name, false) ? "Network has been stopped successfully" : 'Error while stopping network: '.$lv->get_last_error();
 					} elseif (($subaction == 'dumpxml') || ($subaction == 'edit')) {
 						$xml = $lv->network_get_xml($name, false);
 
 						if ($subaction == 'edit') {
 							if (@$_POST['xmldesc']) {
-            	      	$ret = $lv->network_change_xml($name, $_POST['xmldesc']) ? "Network definition has been changed" :
+            	      	$msg = $lv->network_change_xml($name, $_POST['xmldesc']) ? "Network definition has been changed" :
                	      'Error changing network definition: '.$lv->get_last_error();
 							}
 						else
-                  	$ret = 'Editing network XML description: <br /><br /><form method="POST"><table width="100%"><tr><td width="200px">Network XML description: </td>'.
+                  	$msg = 'Editing network XML description: <br /><br /><form method="POST"><table width="100%"><tr><td width="200px">Network XML description: </td>'.
                      '<td><textarea name="xmldesc" rows="25" style="width:80%">'.$xml.'</textarea></td></tr><tr align="center"><td colspan="2">'.
                      '<input type="submit" value=" Edit domain XML description "></tr></form>';
 						}
@@ -53,12 +52,12 @@
 						$dhcp = 'Disabled';
 					$activity = $tmp2['active'] ? 'Active' : 'Inactive';
 
-	            $act = !$tmp2['active'] ? "<a href=\"?subaction=start&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-play green\"></i></a>" :
-                                         "<a href=\"?subaction=stop&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-stop red\"></i></a>";
+	            $act = !$tmp2['active'] ? "<a href=\"?vmpage=networks&amp;action=start&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-play green\"></i></a>" :
+                                         "<a href=\"?vmpage=networks&amp;action=stop&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-stop red\"></i></a>";
    	        // $act .= "<a href=\"?subaction=dumpxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-download blue\"></i></a>";
       	     // if (!$tmp2['active']) {
       	     // 	$act .= "<a href=\"?subaction=edit&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-plus blue\"></i></a>";
-	//				}
+				  //}
 
 					echo "<tr>
    	            <td>{$tmp2['name']}</td>
@@ -72,8 +71,8 @@
 				}
 			echo "</table>";
 
-			if ($ret)
-				echo "<pre>$ret</pre>";
+			if ($msg)
+				echo "<pre>$msg</pre>";
 			?>
 		</div>
 	</div>
