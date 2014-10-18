@@ -50,7 +50,7 @@
             $clrh = true; 
             }
        }
-         //Get domain XML
+         //edit domain XML
          elseif (($action == 'domain-get-xml') || ($action == 'domain-edit')) {
          	$inactive = (!$lv->domain_is_running($res, $name)) ? true : false;
             $xml = $lv->domain_get_xml($domName, $inactive);
@@ -84,7 +84,6 @@
 	$doms = $lv->get_domains();
    $domkeys = array_keys($doms);
    $active = $tmp['active'];
-	$host = gethostname();
 			//Get domain variables for each domain
          for ($i = 0; $i < sizeof($doms); $i++) {
          	$name = $doms[$i];
@@ -102,8 +101,8 @@
               	$scolor = 'Orange';               
             $id = $lv->domain_get_id($res);
             $arch = $lv->domain_get_arch($res);
-            $vnc = $lv->domain_get_vnc_port($res);
-            $port = (int)$vnc - 200;
+            $vncport = $lv->domain_get_vnc_port($res);
+            $wsport = (int)$vncport -200;
 				$nics = $lv->get_network_cards($res);
             if (($diskcnt = $lv->get_disk_count($res)) > 0) {
             	$disks = $diskcnt.' / '.$lv->get_disk_capacity($res);
@@ -113,12 +112,10 @@
             	$disks = '-';
                $diskdesc = '';
             }
-				if ($vnc < 0){
+				if ($vncport < 0){
             	$vnc = '-';
-            	$vncport = $vnc;
             }else{
-            	$vncport = (int)$vnc -200;
-               $vnc = '/plugins/vmMan/vnc_auto.html?autoconnect=true&host='.$host.'&port='.$vncport;
+               $vnc = '/plugins/vmMan/vnc_auto.html?autoconnect=true&host='.gethostname().'&port='.$wsport;
             }
 	         unset($tmp);
             if (!$id)
@@ -136,7 +133,7 @@
                      <td>$nics</td>
                      <td>$arch</td>
                      <td><font color=\"$scolor\">$state</font></td>
-                     <td>$id / $vncport</td>";
+                     <td>$id / $wsport</td>";
 
             echo "<td>";
 					
@@ -150,8 +147,8 @@
               				title=\"restart domain\"><i class=\"glyphicon glyphicon-refresh\"></i></button> | 
               			<button class=\"btn btn-sm btn-danger\" onclick=\"javascript:location.href='?action=domain-stop&amp;uuid=$uuid'\" 
               				title=\"safely shutdown domain\"><i class=\"glyphicon glyphicon-stop\"></i></button> | 
-                   	<button class=\"btn btn-sm\" onclick=\"javascript:location.href='?action=domain-destroy&amp;uuid=$uuid'\" 
-                    		title=\"force domain to shutdown\"><i class=\"glyphicon glyphicon-eject\"></i></button>";
+                   	<a class=\"btn btn-sm btn-default\" href=\"?action=domain-destroy&amp;uuid=$uuid\" 
+                    		onclick=\"return confirm('Are your sure?')\" title=\"force domain to shutdown\"><i class=\"glyphicon glyphicon-eject\"></i></a>";
             }else {
               	if ($state == "paused")
               		echo "<button class=\"btn btn-sm btn-success\" onclick=\"javascript:location.href='?action=domain-resume&amp;uuid=$uuid'\" 
@@ -161,8 +158,8 @@
               				title=\"start domain\"><i class=\"glyphicon glyphicon-play\"></i></button>";
 				}
             if (!$lv->domain_is_running($res, $name))
-                echo " | <button class=\"btn btn-sm btn-danger\" onclick=\"javascript:location.href='?page=main&amp;action=domain-undefine&uuid=$uuid'\" 
-                 		 title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></button>";
+                echo " | <a class=\"btn btn-sm btn-danger\" href=\"?vmpage=main&amp;action=domain-undefine&uuid=$uuid\" 
+                 		 onclick=\"return confirm('Are your sure?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a>";
 		      echo " | <button class=\"btn btn-sm btn-info\" onclick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid'\" 
 		          		title=\"edit domain XML\"><i class=\"glyphicon glyphicon-plus\"></i></button>";
             echo "</td></tr>";

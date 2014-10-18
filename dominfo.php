@@ -1,31 +1,58 @@
 <div class="wrap">
   	<div class="list">
      	<?php
-		   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
-         $subaction = array_key_exists('subaction', $_GET) ? $_GET['subaction'] : false;
-         $ret = false;
-         $domName = $lv->domain_get_name_by_uuid($_GET['uuid']);
-         $res = $lv->get_domain_object($domName);
-			$domtype = $lv->get_domain_type($domName);
-			$emulator = $lv->get_domain_emulator($domName);        
-         $dom = $lv->domain_get_info($res);
-         $mem = number_format($dom['memory'] / 1024000, 1, '.', ' ').' GB';
-         $cpu = $dom['nrVirtCpu'];
-         $state = $lv->domain_state_translate($dom['state']);
-			if ($state == 'running')
-				$scolor = 'LimeGreen';
-			elseif($state == 'shutoff')
-				$scolor = 'Red';
-			else 
-           	$scolor = 'Orange';               
-         $id = $lv->domain_get_id($res);
-         $arch = $lv->domain_get_arch($res);
-         $vnc = $lv->domain_get_vnc_port($res);
+	   require_once('/usr/local/emhttp/plugins/vmMan/include.php');
+      $subaction = array_key_exists('subaction', $_GET) ? $_GET['subaction'] : false;
+      $msg = false;
+      $domName = $lv->domain_get_name_by_uuid($_GET['uuid']);
+      $res = $lv->get_domain_object($domName);
+		$domtype = $lv->get_domain_type($domName);
+		$emulator = $lv->get_domain_emulator($domName);        
+      $dom = $lv->domain_get_info($res);
+      $mem = number_format($dom['memory'] / 1024000, 1, '.', ' ').' GB';
+      $cpu = $dom['nrVirtCpu'];
+      $state = $lv->domain_state_translate($dom['state']);
+		if ($state == 'running')
+			$scolor = 'LimeGreen';
+		elseif($state == 'shutoff')
+			$scolor = 'Red';
+		else 
+        	$scolor = 'Orange';               
+      $id = $lv->domain_get_id($res);
+      $arch = $lv->domain_get_arch($res);
+      $vncport = $lv->domain_get_vnc_port($res);
 
-         if (!$id)
-             $id = 'N/A';
-         if ($vnc <= 0)
-             $vnc = 'N/A';
+      if (!$id)
+          $id = 'N/A';
+      if ($vncport <= 0)
+          $vncport = 'N/A';
+		if ($subaction == 'disk-remove') {
+				$lv->domain_disk_remove($domName, $_GET['dev']) ? 
+				$msg = 'Disk has been successfully removed' : 
+				$msg = 'Cannot remove disk: '.$lv->get_last_error();
+		}
+		if ($subaction == 'disk-add') {
+			$img = array_key_exists('img', $_POST) ? $_POST['img'] : false;
+
+			if ($img)
+				$lv->domain_disk_add($domName, $_POST['img'], $_POST['dev']) ? 
+				$msg = 'Disk has been successfully added to the guest' :
+				$msg = 'Cannot add disk to the guest: '.$lv->get_last_error();
+ 		}
+		if ($subaction == 'nic-remove') {
+			if ((array_key_exists('confirm', $_GET)) && ($_GET['confirm'] == 'yes'))
+				$lv->domain_nic_remove($domName, $_GET['mac']) ? 
+				$msg = 'Network card has been removed successfully' : 
+				$msg = 'Cannot remove network card: '.$lv->get_last_error();
+		}
+		if ($subaction == 'nic-add') {
+			$mac = array_key_exists('mac', $_POST) ? $_POST['mac'] : false;
+
+			if ($mac)
+				$lv->domain_nic_add($domName, $_POST['mac'], $_POST['network'], $_POST['model']) ? 
+				$msg = 'Network card has been successfully added to the guest' :
+				$msg = 'Cannot add NIC to the guest: '.$lv->get_last_error();
+		}
 
          echo "<h3> Domain Information - $domName</h3>
            		<table class=\"table table-striped\">
@@ -40,13 +67,13 @@
            					<b>Domain state: </b><font color=\"$scolor\">$state<br /></font>
            					<b>Domain architecture: </b>$arch<br />
            					<b>Domain ID: </b>$id<br />
-           					<b>VNC Port: </b>$vnc<br />
+           					<b>VNC Port: </b>$vncport<br />
            				</td>
 	        			</tr>
            		</table>";
 
 			//* Disk information */
-         echo "<h4><b>Disk devices</b><a href=\"?action=$action&amp;uuid={$_GET['uuid']}&amp;subaction=disk-add\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
+         echo "<h4><b>Disk devices</b><a href=\"?vmpage=dominfo&amp;uuid={$_GET['uuid']}&amp;subaction=disk-add\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
          $tmp = $lv->get_disk_stats($domName);
 
          if (!empty($tmp)) {
@@ -75,7 +102,8 @@
                         <td align=\"left\">$allocation</td>
                         <td align=\"left\">$physical</td>
                         <td align=\"left\">
-                  	      <a href=\"?action=$action&amp;uuid={$_GET['uuid']}&amp;subaction=disk-remove&amp;dev={$tmp[$i]['device']}\">
+                  	      <a href=\"?vmpage=dominfo&amp;uuid={$_GET['uuid']}&amp;subaction=disk-remove&amp;dev={$tmp[$i]['device']}\"
+                  	      onclick=\"return confirm('Are your sure?')\">
                   	      <i class=\"glyphicon glyphicon-remove red\"></i></a>
                         </td>
 							</tr>";
@@ -127,6 +155,8 @@
          //if ( $dom['state'] == 1 ) {
          //    echo "<h3>Screenshots</h3><img src=\"screenshot.php?uuid={$_GET['uuid']}\">";
          //}
+      	if ($msg)
+		echo $msg;
       ?>
     	</div>
 	</div>

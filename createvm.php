@@ -1,12 +1,6 @@
-<div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	<h4 class="modal-title" id="vmcreateLabel">Create Virtual Machine</h4>
-</div>
-<div class="modal-body">
+<div class="wrap">
 	<div class="list">
 <?php
-//	if (!verify_user($db, USER_PERMISSION_VM_CREATE))
-//		exit;
   require('/usr/local/emhttp/plugins/vmMan/include.php');
   
   $skip = false;
@@ -64,7 +58,7 @@
 <?php
     if ($msg):
 ?>
-    <div id="msg"><b><?php echo $lang->get('msg') ?>: </b><?php echo $msg ?></div>
+    <div id="msg"><b><?php echo $lang->get('msg') ?>:&nbsp; </b><?php echo $msg ?></div>
 <?php
     endif;
 ?>
@@ -117,18 +111,18 @@
 
 <div id="content">
 
-<div class="section"><?php echo $lang->get('create-new-vm') ?></div>
+<div class="section"><h3><?php echo $lang->get('create-new-vm') ?> (NOT WORKING YET!)</h3></div>
 
 <form method="POST">
 
 <table id="form-table">
 <tr>
-    <td align="right"><?php echo $lang->get('name') ?>: </td>
+    <td align="right"><?php echo $lang->get('name') ?>:&nbsp; </td>
     <td><input type="text" name="name" /></td>
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('install-image') ?>: </td>
+    <td align="right"><?php echo $lang->get('install-image') ?>:&nbsp; </td>
     <td>
 		<select name="install_img">
 <?php
@@ -139,7 +133,7 @@
 	</td>
 
 <tr>
-    <td align="right"><?php echo $lang->get('vcpus') ?>: </td>
+    <td align="right"><?php echo $lang->get('vcpus') ?>:&nbsp; </td>
     <td>
 		<select name="cpu_count">
 <?php
@@ -150,7 +144,7 @@
 </td>
 
 <tr>
-    <td align="right"><?php echo $lang->get('features') ?>:</td>
+    <td align="right"><?php echo $lang->get('features') ?>:&nbsp;</td>
     <td>
         <input class="checkbox" type="checkbox" value="1" name="feature_apic" checked="checked" /> APIC<br />
         <input class="checkbox" type="checkbox" value="1" name="feature_acpi" checked="checked" /> ACPI<br />
@@ -160,17 +154,17 @@
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('mem') ?> (MiB):</td>
+    <td align="right"><?php echo $lang->get('mem') ?> (MiB):&nbsp;</td>
     <td><input type="text" name="memory" value="512" /></td>
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('mem_alloc_max') ?> (MiB):</td>
+    <td align="right"><?php echo $lang->get('mem_alloc_max') ?> (MiB):&nbsp;</td>
     <td><input type="text" name="maxmem" value="512" /></td>
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('clock-offset') ?>:</td>
+    <td align="right"><?php echo $lang->get('clock-offset') ?>:&nbsp;</td>
     <td>
         <select name="clock_offset">
           <option value="utc">UTC</option>
@@ -194,14 +188,13 @@
     <td>
         <table>
             <tr>
-                <td align="right"><?php echo $lang->get('vm_network_mac') ?>:</td>
+                <td align="right"><?php echo $lang->get('vm_network_mac') ?>:&nbsp;</td>
                 <td>
 			<input type="text" name="nic_mac" value="<?php echo $lv->generate_random_mac_addr() ?>" id="nic_mac_addr" />
-			<input type="button" onclick="generate_mac_addr()" value="<?php echo $lang->get('network-generate-mac') ?>">
 		</td>
             </tr>
             <tr>
-                 <td align="right"><?php echo $lang->get('vm_network_type') ?>:</td>
+                 <td align="right"><?php echo $lang->get('vm_network_type') ?>:&nbsp;</td>
                  <td>
                      <select name="nic_type">';
 
@@ -214,7 +207,7 @@
                  </td>
             </tr>
             <tr>
-                 <td align="right"><?php echo $lang->get('vm_network_net') ?>:</td>
+                 <td align="right"><?php echo $lang->get('vm_network_net') ?>:&nbsp;</td>
                  <td>
                      <select name="nic_net">';
 
@@ -231,7 +224,7 @@
 </tr>
 
 <tr>
-    <td align="right"><?php echo $lang->get('setup').' '.$lang->get('disk') ?>:</td>
+    <td align="right"><?php echo $lang->get('setup').' '.$lang->get('disk') ?>:&nbsp;</td>
     <td>
       <select name="setup_disk" onchange="change_divs('disk', this.value)">
         <option value="0"><?php echo $lang->get('No') ?></option>
@@ -245,7 +238,7 @@
     <td>
         <table>
             <tr>
-                <td align="right"><?php echo $lang->get('new-vm-disk')?>: </td>
+                <td align="right"><?php echo $lang->get('new-vm-disk')?>:&nbsp; </td>
                 <td>
 		    <select name="new_vm_disk" onchange="vm_disk_change(this.value)">
 			<option value="0"><?php echo $lang->get('new-vm-existing') ?></option>
@@ -256,16 +249,16 @@
             <tr>
 		<td align="right">
 			<span id="vm_disk_existing">
-			<?php echo $lang->get('vm_disk_image')?>:
+			<?php echo $lang->get('vm_disk_image')?>:&nbsp;
 			</span>
 			<span id="vm_disk_create" style="display: none">
-			<?php echo $lang->get('vm-disk-size') ?> (MiB): 
+			<?php echo $lang->get('vm-disk-size') ?> (MiB):&nbsp; 
 			</span>
 		</td>
 		<td><input type="text" name="img_data" /></td>
 	    </tr>
 	    <tr>
-		<td align="right"><?php echo $lang->get('vm_disk_location') ?>: </td>
+		<td align="right"><?php echo $lang->get('vm_disk_location') ?>:&nbsp; </td>
 		<td>
 		    <select name="disk_bus">
 			<option value="ide">IDE Bus</option>
@@ -274,7 +267,7 @@
 		</td>
 	    </tr>
 	    <tr>
-		<td align="right"><?php echo $lang->get('vm_disk_type') ?>: </td>
+		<td align="right"><?php echo $lang->get('vm_disk_type') ?>:&nbsp; </td>
 		<td>
 		    <select name="disk_driver">
 			<option value="raw">raw</option>
@@ -284,7 +277,7 @@
 		</td>
 	    </tr>
 	    <tr>
-		<td align="right"><?php echo $lang->get('vm_disk_dev') ?>: </td>
+		<td align="right"><?php echo $lang->get('vm_disk_dev') ?>:&nbsp; </td>
 		<td>hda</td>
 	    </tr>
 	</table>
@@ -302,8 +295,8 @@
 
 </div>
 
-<tr align="center">
-    <td colspan="2">
+<tr align="right">
+    <td colspan="1">
     <input type="submit" value=" <?php echo $lang->get('create-vm') ?> " />
     </td>
 </tr>
@@ -318,7 +311,5 @@
 <?php
   endif;
 ?>
-
-</div>
 	</div>
 </div>

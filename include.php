@@ -7,14 +7,8 @@
 	$lang_str = false;
    $lv = new Libvirt($uri, null, null, $lg, $lang_str);
 	$lang = new Language($lang_str);
-   $vmpage = array_key_exists('vmpage', $_GET) ? $_GET['vmpage'] : '';
    $action = array_key_exists('action', $_GET) ? $_GET['action'] : '';
    $subaction = array_key_exists('subaction', $_GET) ? $_GET['subaction'] : '';
-  	$tmp = $lv->get_domain_count();
-	$doms = $lv->get_domains();
-   $domkeys = array_keys($doms);
-   $active = $tmp['active'];
-	$host = gethostname();
    //Create nav bar		
 	echo "<div class=\"wrap\">
 				<div class=\"info\">
@@ -25,6 +19,12 @@
 		  		 	      	onclick=\"javascript:location.href='?vmpage=main'\" 
 		  		 	      	title=\"main page\"><i class=\"glyphicon glyphicon-home\">
 	  			 	      	</i>&#32;Main</button>
+	  			 	      </div>
+		  		 	      <div class=\"btn-group\">
+		  		 	      	<button class=\"btn btn-info\" 
+		  		 	      	onclick=\"javascript:location.href='?vmpage=createvm'\" 
+		  		 	      	title=\"create VM from template\"><i class=\"glyphicon glyphicon-plus\">
+	  			 	      	</i>&#32;Create</button>
 	  			 	      </div>
 	  	 	 		  	   <div class=\"btn-group\">
   		  	 	 	  	   	<button class=\"btn btn-primary\"

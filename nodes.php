@@ -5,8 +5,6 @@
 				$ret = false;
 				if (array_key_exists('subaction', $_GET)) {
 					$name = $_GET['name'];
-				if ($_GET['subaction'] == 'dumpxml')
-					$ret ="<script type=\"text/javascript\"> $(window).load(function(){ $('#viewXMLDialog').modal('show'); }); </script>"; 
 				}
 				$cap = $_GET['cap'];
 				echo "<h3>Device Node Information</h3>   	
@@ -39,8 +37,8 @@
 				for ($i = 0; $i < sizeof($tmp); $i++) {
 					$tmp2 = $lv->get_node_device_information($tmp[$i]);
 					
-					$act = !array_key_exists('cap', $_GET) ? "<a href=\"?action={$_GET['action']}&amp;subaction=dumpxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-download\"></i></a>" :
-					   "<a href=\"?subaction=dumpxml&amp;cap={$_GET['cap']}&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-download\"></i></a>";  
+					$act = !array_key_exists('cap', $_GET) ? "<a href=\"?action={$_GET['action']}&amp;subaction=dumpxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-circle-arrow-down\"></i></a>" :
+					   "<a href=\"?vmpage=viewxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-circle-arrow-down green\"></i></a>";  
 					if ($tmp2['capability'] == 'system') {
 						$driver = '-';
 						$vendor = array_key_exists('hardware_vendor', $tmp2) ? $tmp2['hardware_vendor'] : '';
