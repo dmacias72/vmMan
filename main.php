@@ -114,6 +114,7 @@
             }
 				if ($vncport < 0){
             	$vnc = '-';
+            	$wsport= '-';
             }else{
                $vnc = '/plugins/vmMan/vnc_auto.html?autoconnect=true&host='.gethostname().'&port='.$wsport;
             }
