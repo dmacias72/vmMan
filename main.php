@@ -7,10 +7,6 @@ if (!$lv->get_domains())
 else {
 	$ret = false;
 	$clrh = false;
-   $doms = $lv->get_domains;
-   $domkeys = array_keys($doms);
-  	$tmp = $lv->get_domain_count();
-   $active = $tmp['active'];
    if ($action) {
      	$domName = $lv->domain_get_name_by_uuid($uuid);
       if ($action == 'domain-start') {
@@ -82,6 +78,10 @@ else {
             }
 			}
 		}
+   $doms = $lv->get_domains();
+   $domkeys = array_keys($doms);
+  	$tmp = $lv->get_domain_count();
+   $active = $tmp['active'];
 	echo "<div class=\"wrap\">
 				<div class=\"list\">
 					<h3>Virtual Machine Information</h3>			
@@ -99,7 +99,7 @@ else {
               			<th>Auto</th>
               			<th>Action</th>
             		</tr>";
-	//Get domain variables for each domain
+   //Get domain variables for each domain
    for ($i = 0; $i < sizeof($doms); $i++) {
    	$name = $doms[$i];
       $res = $lv->get_domain_by_name($name);
