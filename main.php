@@ -2,28 +2,22 @@
 	<div class="list">
 		
 <?php
-if (!$lv->get_domains())
-	echo "<h3>No Domains Defined.  Create from template or Add XML description.</h3>";
-else {
 	$ret = false;
 	$clrh = false;
    if ($action) {
      	$domName = $lv->domain_get_name_by_uuid($uuid);
       if ($action == 'domain-start') {
-        	$lv->domain_start($domName) ? 
-        		$ret = "Domain $domName has been successfully started" : 
-        		$ret = 'Error while starting domain: '.$lv->get_last_error();
+        	$ret = $lv->domain_start($domName) ? "Domain $domName has been successfully started" : 
+        		'Error while starting domain: '.$lv->get_last_error();
 			$clrh=true; }
 		elseif ($action == 'domain-autostart') {
 			$res = $lv->get_domain_by_name($name);
 	 		if ($lv->domain_get_autostart($res)) {
-	 			$lv->domain_set_autostart($res, false) ?
-	 			$ret = "Domain $name has been successfully removed from autostart" :
-	 			$ret = 'Error while removing domain from autostart: '.$lv->get_last_error();
+	 			$ret = $lv->domain_set_autostart($res, false) ? "Domain $name has been successfully removed from autostart" :
+	 				'Error while removing domain from autostart: '.$lv->get_last_error();
 	 		}else{
-	 			$lv->domain_set_autostart($res, true) ?  
-       		$ret = "Domain $name has been successfully added to autostart" :
-       		$ret = 'Error while setting domain to autostart: '.$lv->get_last_error(); 
+	 			$ret = $lv->domain_set_autostart($res, true) ? "Domain $name has been successfully added to autostart" :
+       			'Error while setting domain to autostart: '.$lv->get_last_error(); 
 			}
 			$clrh=true; }
       elseif ($action == 'domain-pause') {
@@ -52,15 +46,13 @@ else {
          	'Error while destroying domain: '.$lv->get_last_error();
       	$clrh = true; }
       elseif ($action == 'domain-undefine') {
-         $lv->domain_undefine($domName) ? 
-         	$ret = "Domain $domName has been successfully undefined" : 
-         	$ret = 'Error while undefining domain: '.$lv->get_last_error();
+         $ret = $lv->domain_undefine($domName) ? "Domain $domName has been successfully undefined" : 
+         	'Error while undefining domain: '.$lv->get_last_error();
       	$clrh = true; }
       elseif ($action == 'domain-define') {
          if (@$_POST['xmldesc']) {
-      	   $lv->domain_define( $_POST['xmldesc']) ? 
-   	        	$ret = "Domain definition has been successfully added" : 
-   	        	$ret = 'Error adding domain definition: '.$lv->get_last_error();
+      	   $ret = $lv->domain_define( $_POST['xmldesc']) ? "Domain definition has been successfully added" : 
+   	      	'Error adding domain definition: '.$lv->get_last_error();
             $clrh = true; 
             }
        }
@@ -70,9 +62,8 @@ else {
             $xml = $lv->domain_get_xml($domName, $inactive);
             if ($action == 'domain-edit') {
             	if (@$_POST['xmldesc']) {
-               	$lv->domain_change_xml($domName, $_POST['xmldesc']) ? 
-               	$ret = "Domain definition has been successfully changed" :
-                  $ret = 'Error changing domain definition: '.$lv->get_last_error();
+               	$ret = $lv->domain_change_xml($domName, $_POST['xmldesc']) ? "Domain definition has been successfully changed" :
+                  	'Error changing domain definition: '.$lv->get_last_error();
                   $clrh = true;
             	}
             }
@@ -100,6 +91,9 @@ else {
               			<th>Action</th>
             		</tr>";
    //Get domain variables for each domain
+	if (!$lv->get_domains())
+		$ret = "No domains defined.  Create from template or add XML description.";
+	else {
    for ($i = 0; $i < sizeof($doms); $i++) {
    	$name = $doms[$i];
       $res = $lv->get_domain_by_name($name);
@@ -163,7 +157,7 @@ else {
         			<button class=\"btn btn-sm btn-danger\" onClick=\"javascript:location.href='?action=domain-stop&amp;uuid=$uuid'\" 
         				title=\"safely shutdown domain\"><i class=\"glyphicon glyphicon-stop\"></i></button> | 
               	<a class=\"btn btn-sm btn-default\" href=\"?action=domain-destroy&amp;uuid=$uuid\" 
-              		onClick=\"return confirm('Are your sure you want to force $name to shutdown?')\" title=\"force domain to shutdown\"><i class=\"glyphicon glyphicon-eject\"></i></a>";
+              		onClick=\"return confirm('Are your sure you want to force shutdown $name?')\" title=\"force domain to shutdown\"><i class=\"glyphicon glyphicon-eject\"></i></a>";
  		}else {
         	if ($state == "paused")
         		echo "<button class=\"btn btn-sm btn-success\" onClick=\"javascript:location.href='?action=domain-resume&amp;uuid=$uuid'\" 
@@ -177,13 +171,12 @@ else {
           		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a>";
 		echo " | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid'\" 
 		  		title=\"edit domain XML\"><i class=\"glyphicon glyphicon-plus\"></i></button></td></tr>";
+		}
 	}
-	echo "</table>";
-		if ($ret)
-			echo $ret;
-	echo "</div>";
+	echo "</table></div>";
+	if ($ret)
+		echo $ret;
 	if ($clrh) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs'); </script>";
-} 
 ?>
 	</div>
 </div>

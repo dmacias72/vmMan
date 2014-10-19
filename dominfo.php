@@ -102,7 +102,7 @@
                         <td align=\"left\">$physical</td>
                         <td align=\"left\">
                   	      <a href=\"?vmpage=dominfo&amp;uuid={$_GET['uuid']}&amp;subaction=disk-remove&amp;dev={$tmp[$i]['device']}\"
-                  	      onclick=\"return confirm('Are your sure?')\">
+                  	      onclick=\"return confirm('Disk is not deleted. Remove from domain?')\" title=\"remove disk from domain\">
                   	      <i class=\"glyphicon glyphicon-remove red\"></i></a>
                         </td>
 							</tr>";

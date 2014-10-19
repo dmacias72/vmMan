@@ -5,9 +5,13 @@
 				if ($subaction) {
    	  	    	$name = $_GET['name'];
 					if ($subaction == 'start'){
-         	      $msg = $lv->set_network_active($name, true) ? "Network has been started successfully" : 'Error while starting network: '.$lv->get_last_error();
+         	      $lv->set_network_active($name, true) ? 
+         	      	$msg = "Network has been started successfully" : 
+         	      	$msg = 'Error while starting network: '.$lv->get_last_error();
 					} elseif ($subaction == 'stop'){
-						$msg = $lv->set_network_active($name, false) ? "Network has been stopped successfully" : 'Error while stopping network: '.$lv->get_last_error();
+						$lv->set_network_active($name, false) ? 
+							$msg = "Network has been stopped successfully" : 
+							$msg = 'Error while stopping network: '.$lv->get_last_error();
 					} elseif (($subaction == 'dumpxml') || ($subaction == 'edit')) {
 						$xml = $lv->network_get_xml($name, false);
 

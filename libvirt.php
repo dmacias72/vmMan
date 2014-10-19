@@ -686,6 +686,23 @@
 			return ($tmp) ? $tmp : $this->_set_last_error();
 		}
 
+		function storagepool_define_xml($xml) {
+			$tmp = libvirt_storagepool_define_xml($this->conn, $xml, false);
+			return ($tmp) ? $tmp : $this->_set_last_error();
+		}
+
+		function storagepool_undefine($res) {
+			return libvirt_storagepool_undefine($res);
+		}
+
+		function storagepool_create($res) {
+			return libvirt_storagepool_create($res);
+		}
+
+		function storagepool_destroy($res) {
+			return libvirt_storagepool_destroy($res);
+		}
+
 		function get_storagepool_res($res) {
 			if ($res == false)
 				return false;
@@ -1585,9 +1602,11 @@
 			$tmp = libvirt_node_get_info($this->conn);
 			return ($tmp) ? $tmp : $this->_set_last_error();
 		}
+
 		function domain_get_autostart($res) {
 			return libvirt_domain_get_autostart($res);
 		}
+
 		function domain_set_autostart($res,$flags) {
 			return libvirt_domain_set_autostart($res,$flags);
 		}
