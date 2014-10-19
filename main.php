@@ -168,8 +168,7 @@
 		}
       if (!$lv->domain_is_running($res, $name))
       	echo " | <a class=\"btn btn-sm btn-danger\" href=\"?vmpage=main&amp;action=domain-undefine&uuid=$uuid\" 
-          		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a>";
-		echo " | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid'\" 
+          		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a> | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid'\" 
 		  		title=\"edit domain XML\"><i class=\"glyphicon glyphicon-plus\"></i></button></td></tr>";
 		}
 	}
