@@ -1,10 +1,22 @@
-	<div class="wrap">
-		<div class="list">
-			<?php
+<div class="wrap">
+	<div class="list">
+	<?php
+	if ($action == 'volume-create') {
+		include('/usr/local/emhttp/plugins/vmMan/createvol.php');
+	}	else {		
   		if ($subaction == 'volume-delete') {
 				$lv->storagevolume_delete( base64_decode($_GET['vpath']) ) ? 
 				$msg = 'Volume has been deleted successfully' : 
 				$msg = 'Cannot delete volume';
+				$clhr = true;
+		}
+		else if ($subaction == 'volume-save') {
+			if (array_key_exists('sent', $_POST)) {
+				$lv->storagevolume_create($_GET['pool'], $_POST['vname'], $_POST['capacity'], $_POST['allocation']) ?
+					$msg = 'Volume has been created successfully' : 
+					$msg = 'Cannot create volume';
+					$clrh = true;
+			}
 		}
 				echo "<h3>Storage Pool Information<a href=\"?vmpage=storage\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h3>
 				<table class=\"table table-striped\">
@@ -34,7 +46,7 @@
   	  	      	      <td>{$lv->format_size($info['allocation'], 2)}</td>
   		 	      	   <td>{$lv->format_size($info['available'], 2)}</td>
 							<td>{$info['path']}</td>
-							<td><a href=\"?vmpage=storage&amp;pool={$pools[$i]}&amp;subaction=volume-create\"><i class=\"glyphicon glyphicon-plus green\"></a></td>
+							<td><a href=\"?vmpage=storage&amp;pool={$pools[$i]}&amp;action=volume-create\"><i class=\"glyphicon glyphicon-plus green\"></a></td>
   	       	      </tr>";
 	
 					if ($info['volume_count'] > 0) {
@@ -71,6 +83,8 @@
 				echo "</table>";
 			if ($msg)
 				echo $msg;
-			?>
-		</div>
+			if ($clrh) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs'); </script>";
+		}
+	?>
 	</div>
+</div>
