@@ -37,7 +37,7 @@
 					$tmp2 = $lv->get_node_device_information($tmp[$i]);
 					
 					$act = !array_key_exists('cap', $_GET) ? "<a href=\"?action={$_GET['action']}&amp;subaction=dumpxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-circle-arrow-down\"></i></a>" :
-					   "<a href=\"?vmpage=viewxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-circle-arrow-down green\"></i></a>";  
+					   "<a href=\"?vmpage=viewxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-circle-arrow-down blue\"></i></a>";  
 					if ($tmp2['capability'] == 'system') {
 						$driver = '-';
 						$vendor = array_key_exists('hardware_vendor', $tmp2) ? $tmp2['hardware_vendor'] : '';
