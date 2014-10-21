@@ -295,7 +295,7 @@
 
 <tr align="right">
     <td colspan="1">
-    <input type="submit" value="Create VM" />
+    <input type="hidden" value="Create VM" />
     </td>
 </tr>
 </table>
