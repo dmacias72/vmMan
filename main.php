@@ -57,16 +57,15 @@
             }
        }
          //edit domain XML
-         elseif (($action == 'domain-get-xml') || ($action == 'domain-edit')) {
+         elseif ($action == 'domain-save') {
          	$inactive = (!$lv->domain_is_running($res, $name)) ? true : false;
             $xml = $lv->domain_get_xml($domName, $inactive);
-            if ($action == 'domain-edit') {
-            	if (@$_POST['xmldesc']) {
-               	$ret = $lv->domain_change_xml($domName, $_POST['xmldesc']) ? "Domain definition has been successfully changed" :
-                  	'Error changing domain definition: '.$lv->get_last_error();
-                  $clrh = true;
-            	}
-            }
+           	if (@$_POST['xmldesc']) {
+           		$xml = $_POST['xmldesc'];
+              	$ret = $lv->domain_change_xml($domName, $xml) ? "Domain definition has been successfully changed" :
+                 	'Error changing domain definition: '.$lv->get_last_error();
+                 $clrh = true;
+           	}
 			}
 		}
    $doms = $lv->get_domains();
@@ -166,13 +165,17 @@
         		echo "<button class=\"btn btn-sm btn-success\" onClick=\"javascript:location.href='?action=domain-start&amp;uuid=$uuid'\" 
         				title=\"start domain\"><i class=\"glyphicon glyphicon-play\"></i></button>";
 		}
-      if (!$lv->domain_is_running($res, $name))
+      if ($lv->domain_is_running($res, $name))
+			echo " | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid&amp;view=readonly'\" 
+		  		title=\"view domain XML\"><i class=\"glyphicon glyphicon-arrow-down\"></i></button>";
+		else
       	echo " | <a class=\"btn btn-sm btn-danger\" href=\"?vmpage=main&amp;action=domain-undefine&uuid=$uuid\" 
-          		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a> | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid'\" 
-		  		title=\"edit domain XML\"><i class=\"glyphicon glyphicon-plus\"></i></button></td></tr>";
+          		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a>
+          		  | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid&amp;view='\" 
+		  		title=\"edit domain XML\"><i class=\"glyphicon glyphicon-plus\"></i></button>";
 		}
 	}
-	echo "</table></div>";
+	echo "</td></tr></table></div>";
 	if ($ret)
 		echo $ret;
 	if ($clrh) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs'); </script>";
