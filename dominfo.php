@@ -20,6 +20,12 @@
       $id = $lv->domain_get_id($res);
       $arch = $lv->domain_get_arch($res);
       $vncport = $lv->domain_get_vnc_port($res);
+      $wsport = (int)$vncport -200;
+		if ($vncport < 0){
+        	$vnc = '-';
+        	$wsport= '-';
+      }else
+         $vnc = '/plugins/vmMan/vnc_auto.html?autoconnect=true&host='.gethostname().'&port='.$wsport;
 
       if (!$id)
           $id = 'N/A';
@@ -66,7 +72,8 @@
            					<b>Domain state: </b><font color=\"$scolor\">$state<br /></font>
            					<b>Domain architecture: </b>$arch<br />
            					<b>Domain ID: </b>$id<br />
-           					<b>VNC Port: </b>$vncport<br />
+           					<b>WS Port: </b>$wsport&nbsp;&nbsp;<a href=\"#\" onClick=\"window.open('$vnc','_blank','scrollbars=yes,resizable=yes'); return false;\" 
+      	  			title=\"open VNC connection\"><i class=\"glyphicon glyphicon-eye-open\"></i></a><br />
            				</td>
 	        			</tr>
            		</table>";
