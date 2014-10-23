@@ -15,6 +15,15 @@
 							<td align="right">Allocation:&nbsp;</td>
 							<td align="left"><input type="text" name="allocation" placeholder="e.g. 10M or 1G"></td>
 						</tr>
+						<tr align="left">
+							<td align="right">Disk type:&nbsp;</td>
+							<td align="left"><select name="disk_driver">
+														<option value="qcow2">qcow2</option>
+														<option value="raw">raw</option>
+														<option value="qcow">qcow</option>
+		    										</select>
+							</td>
+	    				</tr>
 						<tr align="right">
 							<td align="left"></td>
 							<td align="left">
