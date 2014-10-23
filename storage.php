@@ -17,7 +17,7 @@
 		}
 		elseif ($subaction == 'volume-save') {
 			if (array_key_exists('sent', $_POST)) {
-				$lv->storagevolume_create($_GET['pool'], $_POST['vname'], $_POST['capacity'], $_POST['allocation']) ?
+				$lv->storagevolume_create($_GET['pool'], $_POST['vname'], $_POST['capacity'], $_POST['allocation'], $_POST['disk_driver']) ?
 					$msg = 'Volume has been successfully created' : 
 					$msg = 'Cannot create volume '.$lv->get_last_error();
 					$clrh = true;
