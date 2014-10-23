@@ -63,14 +63,9 @@
 						return false;
 				}
 
-				if ($disk['image'][0] != '/')
-					$path = ini_get('libvirt.image_path').'/'.$disk['image'];
-				else
-					$path = $disk['image'];
-
 				$diskstr = "<disk type='file' device='disk'>
 						<driver name='qemu' type='{$disk['driver']}' />
-                                                <source file='$path'/>
+                                                <source file='".base64_decode( $disk['image'])."'/>
                                                 <target bus='{$disk['bus']}' dev='hda' />
                                          </disk>";
 			}
@@ -80,9 +75,9 @@
 				if ($nic['type'] != 'default')
 					$model = "<model type='{$nic['type']}'/>";
 				$netstr = "
-					    <interface type='network'>
+					    <interface type='bridge'>
 					      <mac address='{$nic['mac']}'/>
-					      <source network='{$nic['network']}'/>
+					      <source bridge='{$nic['network']}'/>
 					      $model
 					    </interface>";
 			}
@@ -93,14 +88,18 @@
 				<memory>$maxmem</memory>
 				<uuid>$uuid</uuid>
 				<os>
-					<type arch='i686'>hvm</type>
+					<type arch='x86_64'>hvm</type>
 					<boot dev='cdrom'/>
 					<boot dev='hd'/>
 				</os>
 				<features>
 				$fs
 				</features>
-				<clock offset=\"$clock\"/>
+				<clock offset=\"$clock\">
+				  	<timer name='rtc' tickpolicy='catchup'/>
+					<timer name='pit' tickpolicy='delay'/>
+					<timer name='hpet' present='yes'/>
+				</clock>
 				<on_poweroff>destroy</on_poweroff>
 				<on_reboot>destroy</on_reboot>
 				<on_crash>destroy</on_crash>
@@ -110,15 +109,16 @@
 					$diskstr
 					<disk type='file' device='cdrom'>
 						<driver name='qemu'/>
-						<source file='$img'/>
+						<source file='".base64_decode($img)."'/>
 						<target dev='hdc' bus='ide'/>
 						<readonly/>
 					</disk>
 					$netstr
 					<input type='mouse' bus='ps2'/>
-					<graphics type='vnc' port='-1'/>
+					<graphics type='vnc' port='-1' autoport='yes' websocket='-1' listen='0.0.0.0'>
+						<listen type='address' address='0.0.0.0'/>
+					</graphics>
 					<console type='pty'/>
-					<sound model='ac97'/>
 					<video>
 						<model type='cirrus'/>
 					</video>
@@ -136,13 +136,17 @@
 					<memory>$maxmem</memory>
 					<uuid>$uuid</uuid>
 					<os>
-						<type arch='i686'>hvm</type>
+						<type arch='x86_64'>hvm</type>
 						<boot dev='hd'/>
 					</os>
 					<features>
 					$fs
 					</features>
-					<clock offset=\"$clock\"/>
+					<clock offset=\"$clock\">
+					  	<timer name='rtc' tickpolicy='catchup'/>
+						<timer name='pit' tickpolicy='delay'/>
+						<timer name='hpet' present='yes'/>
+					</clock>
 					<on_poweroff>destroy</on_poweroff>
 					<on_reboot>destroy</on_reboot>
 					<on_crash>destroy</on_crash>
@@ -152,9 +156,10 @@
 						$diskstr
 						$netstr
 						<input type='mouse' bus='ps2'/>
-						<graphics type='vnc' port='-1'/>
+						<graphics type='vnc' port='-1' autoport='yes' websocket='-1' listen='0.0.0.0'>
+							<listen type='address' address='0.0.0.0'/>
+						</graphics>
 						<console type='pty'/>
-						<sound model='ac97'/>
 						<video>
 							<model type='cirrus'/>
 						</video>
@@ -812,16 +817,19 @@
 			return $size;
 		}
 
-		function storagevolume_create($pool, $name, $capacity, $allocation) {
+		function storagevolume_create($pool, $name, $capacity, $allocation, $format) {
 			$pool = $this->get_storagepool_res($pool);
 
 			$capacity = $this->parse_size($capacity);
 			$allocation = $this->parse_size($allocation);
 
 			$xml = "<volume>\n".
-                               "  <name>$name</name>\n".
-                               "  <capacity>$capacity</capacity>\n".
-                               "  <allocation>$allocation</allocation>\n".
+                               "   <name>$name</name>\n".
+                               "   <capacity>$capacity</capacity>\n".
+                               "   <allocation>$allocation</allocation>\n".
+                               "   <target>\n".
+                               "      <format type='$format'/>\n".
+                               "   </target>\n".   
                                "</volume>";
 
 			$tmp = libvirt_storagevolume_create_xml($pool, $xml);
@@ -1014,7 +1022,7 @@
 		}
 
 		function get_nic_models() {
-			return array('default', 'rtl8139', 'e1000', 'pcnet', 'ne2k_pci', 'virtio');
+			return array('virtio', 'default', 'rtl8139', 'e1000', 'pcnet', 'ne2k_pci');
 		}
 
 		function get_network_res($network) {
