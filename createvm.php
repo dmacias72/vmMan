@@ -3,12 +3,13 @@
 <?php
   $skip = false;
   $msg = false;
+  $pools = $lv->get_storagepools();
+  $network_cfg = parse_ini_file( "/boot/config/network.cfg" );
   if (array_key_exists('sent', $_POST)) {
 	$features = array('apic', 'acpi', 'pae', 'hap');
 
-	$iso_path = ini_get('libvirt.iso_path');
 
-	$img = $iso_path.'/'.$_POST['install_img'];
+	$img = $_POST['install_img'];
 
 	$feature = array();
 	for ($i = 0; $i < sizeof($features); $i++)
@@ -25,7 +26,7 @@
 	if ($_POST['setup_disk']) {
 		if ($_POST['new_vm_disk']) {
 			$disk['image'] = $_POST['name'].'.'.$_POST['disk_driver'];
-			$disk['size'] = (int)$_POST['img_data'];
+			$disk['size'] = (int)$_POST['new_img_data'];
 			$disk['bus'] = $_POST['disk_bus'];
 			$disk['driver'] = $_POST['disk_driver'];
 		}
@@ -45,8 +46,6 @@
 		$msg = "New virtual machine has been created successfully";
 	}
   }
-
-  $isos = libvirt_get_iso_images();
 
   $ci  = $lv->get_connect_information();
   $maxcpu = $ci['hypervisor_maxvcpus'];
@@ -109,23 +108,40 @@
 
 <div id="content">
 
-<div class="section"><h3>Create a new VM (NOT WORKING YET!)</h3></div>
+<div class="section"><h3>Create a new Virtual Machine</h3></div>
 
 <form method="POST">
 
 <table id="form-table">
 <tr>
     <td align="right">Name:&nbsp; </td>
-    <td><input type="text" name="name" /></td>
+    <td><input type="text" name="name" title="name of vitual machine" placeholder="name of vitual machine" /></td>
 </tr>
 
 <tr>
-    <td align="right">Install image:&nbsp; </td>
+    <td align="right">Install media (cdrom):&nbsp; </td>
     <td>
-		<select name="install_img">
+		<select name="install_img" title="cdrom or media image used for installing operating system">
 <?php
-		for ($i = 0; $i < sizeof($isos); $i++)
-			echo "<option value=\"{$isos[$i]}\">{$isos[$i]}</option>";
+	if(!$pools) 
+		echo "<option value=\"false\">No Storage Pools</option>";
+	else {
+		for ($i = 0; $i < sizeof($pools); $i++) {
+			$pname = $pools[$i];
+			$info = $lv->get_storagepool_info($pname);
+			if (!$info['volume_count'] > 0) 
+				echo "<option value=\"false\">No Storage Volumes</option>";
+			else {
+				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
+				$tmp_keys = array_keys($tmp);
+				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
+					$vname = $tmp_keys[$ii];
+					$vpath = base64_encode($tmp[$vname]['path']);
+					echo "<option value=\"$vpath\">$vname</option>";
+				}
+			}
+		}	
+	}
 ?>
 		</select>
 	</td>
@@ -133,7 +149,7 @@
 <tr>
     <td align="right">vCPUs:&nbsp; </td>
     <td>
-		<select name="cpu_count">
+		<select name="cpu_count" title="define number of vpus for domain">
 <?php
         for ($i = 1; $i <= $maxcpu; $i++)
             echo '<option value='.$i.'>'.$i.'</option>';
@@ -144,29 +160,29 @@
 <tr>
     <td align="right">Features:&nbsp;</td>
     <td>
-        <input class="checkbox" type="checkbox" value="1" name="feature_apic" checked="checked" /> APIC<br />
-        <input class="checkbox" type="checkbox" value="1" name="feature_acpi" checked="checked" /> ACPI<br />
-        <input class="checkbox" type="checkbox" value="1" name="feature_pae" checked="checked" /> PAE<br />
-        <input class="checkbox" type="checkbox" value="1" name="feature_hap" /> HAP
+        <input class="checkbox" type="checkbox" value="1" name="feature_apic" title="APIC allows the use of programmable IRQ management" checked="checked" /> APIC<br />
+        <input class="checkbox" type="checkbox" value="1" name="feature_acpi" title="ACPI is for power management, required for graceful shutdown" checked="checked" /> ACPI<br />
+        <input class="checkbox" type="checkbox" value="1" name="feature_pae" title="Physical address extension mode allows 32-bit guests to address more than 4 GB of memory" checked="checked" /> PAE<br />
+        <input class="checkbox" type="checkbox" value="1" name="feature_hap" title="Enable use of Hardware Assisted Paging if available in the hardware" /> HAP
     </td>
 </tr>
 
 <tr>
     <td align="right">Memory (MiB):&nbsp;</td>
-    <td><input type="text" name="memory" value="512" /></td>
+    <td><input type="text" name="memory" value="512" title="define the amount memory" /></td>
 </tr>
 
 <tr>
-    <td align="right">Max. allocation (MiB):&nbsp;</td>
-    <td><input type="text" name="maxmem" value="512" /></td>
+    <td align="right">Max. Mem (MiB):&nbsp;</td>
+    <td><input type="text" name="maxmem" value="512" title="define the maximun amount of memory" /></td>
 </tr>
 
 <tr>
     <td align="right">Clock offset:&nbsp;</td>
     <td>
-        <select name="clock_offset">
-          <option value="utc">UTC</option>
+        <select name="clock_offset" title="how the guest clock is synchronized to the host">
           <option value="localtime">localtime</option>
+          <option value="utc">UTC</option>
         </select>
     </td>
 </tr>
@@ -175,26 +191,24 @@
     <td align="right">Setup Network:&nbsp;</td>
     <td>
       <select name="setup_nic" onchange="change_divs('network', this.value)">
-	<option value="0">No</option>
 	<option value="1">Yes</option>
+	<option value="0">No</option>
       </select>
     </td>
 </tr>
 
-<tr id="setup_network" style="display: none">
+<tr id="setup_network" style="display: table-row">
     <td>&nbsp;</td>
     <td>
         <table>
             <tr>
-                <td align="right">MAC address:&nbsp;</td>
-                <td>
-			<input type="text" name="nic_mac" value="<?php echo $lv->generate_random_mac_addr() ?>" id="nic_mac_addr" />
+                <td align="left">MAC:&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="nic_mac" title="random mac, you can supply your own" value="<?php echo $lv->generate_random_mac_addr() ?>" id="nic_mac_addr" />
 		</td>
             </tr>
             <tr>
-                 <td align="right">NIC Type:&nbsp;</td>
-                 <td>
-                     <select name="nic_type">';
+                 <td align="left">NIC:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                     <select name="nic_type" title="virtio unless passing through nic">';
 
 <?php
 	$models = $lv->get_nic_models();
@@ -205,17 +219,9 @@
                  </td>
             </tr>
             <tr>
-                 <td align="right">Network:&nbsp;</td>
-                 <td>
-                     <select name="nic_net">';
-
-<?php
-        $nets = $lv->get_networks();
-        for ($i = 0; $i < sizeof($nets); $i++)
-                echo '<option value="'.$nets[$i].'">'.$nets[$i].'</option>';
-?>
-                     </select>
-                 </td>
+   	         <td align="left" >Bridge:&nbsp;
+	        			<input type="text" value="<?=$network_cfg['BRNAME'];?>" name="nic_net" placeholder="name of bridge in unRAID" title="name of bridge in unRAID automatically filled in" />			
+              </td>
             </tr>
         </table>
     </td>
@@ -225,64 +231,84 @@
     <td align="right">Setup disk:&nbsp;</td>
     <td>
       <select name="setup_disk" onchange="change_divs('disk', this.value)">
-        <option value="0">No</option>
         <option value="1">Yes</option>
+        <option value="0">No</option>
       </select>
     </td>
 </tr>
 
-<tr id="setup_disk" style="display: none">
+<tr id="setup_disk" style="display: table-row">
     <td>&nbsp;</td>
     <td>
         <table>
             <tr>
-                <td align="right">VM disk:&nbsp;</td>
-                <td>
-		    <select name="new_vm_disk" onchange="vm_disk_change(this.value)">
+                <td align="left" hidden>VM disk:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		    <select name="new_vm_disk" onchange="vm_disk_change(this.value)" disabled hidden>
 			<option value="0">Use existing disk image</option>
 			<option value="1">Create new disk image</option>
 		    </select>
 		</td>
 	    </tr>
-            <tr>
-		<td align="right">
-			<span id="vm_disk_existing">
-			Disk image:&nbsp;
-			</span>
-			<span id="vm_disk_create" style="display: none">
-			New disk size (GB):&nbsp; 
-			</span>
+            <tr id="vm_disk_existing">
+		<td align="left">Disk image:&nbsp;
+		<select name="img_data" title="select domain image to use for virtual machine">
+<?php
+	if(!$pools) 
+		echo "<option value=\"false\">No Storage Pools</option>";
+	else {
+		for ($i = 0; $i < sizeof($pools); $i++) {
+			$pname = $pools[$i];
+			$info = $lv->get_storagepool_info($pname);
+			if (!$info['volume_count'] > 0) 
+				echo "<option value=\"false\">No Storage Volumes</option>";
+			else {
+				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
+				$tmp_keys = array_keys($tmp);
+				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
+					$vname = $tmp_keys[$ii];
+					$vpath = base64_encode($tmp[$vname]['path']);
+					echo "<option value=\"$vpath\">$vname</option>";
+				}
+			}
+		}	
+	}
+?>
+			</select>
 		</td>
-		<td><input type="text" name="img_data" /></td>
 	    </tr>
+       <tr id="vm_disk_create" style="display: none">
+		<td align="left">Disk (GB):&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="new_img_data" />			
+		</td>
+	    </tr>
+
 	    <tr>
-		<td align="right">Disk Location:&nbsp; </td>
-		<td>
-		    <select name="disk_bus">
-			<option value="ide">IDE Bus</option>
-			<option value="scsi">SCSI Bus</option>
+		<td align="left">Disk bus:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		    <select name="disk_bus" title="virtio unless passing through controller" >
+			<option value="virtio">virtio</option>
+			<option value="scsi">SCSI</option>
+			<option value="ide">IDE</option>
 		    </select>
 		</td>
 	    </tr>
 	    <tr>
-		<td align="right">Driver type:&nbsp;</td>
-		<td>
-		    <select name="disk_driver">
+		<td align="left">Disk type:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		    <select name="disk_driver" title="type of storage image">
+			<option value="qcow2">qcow2</option>
 			<option value="raw">raw</option>
 			<option value="qcow">qcow</option>
-			<option value="qcow2">qcow2</option>
 		    </select>
 		</td>
 	    </tr>
 	    <tr>
-		<td align="right">Domain device:&nbsp;</td>
-		<td>hda</td>
+		<td align="left">Domain device:&nbsp;
+		hda</td>
 	    </tr>
 	</table>
     </td>
 </tr>
 <tr>
-	<td align="right">Set as persistent:&nbsp;</td>
+	<td align="right">Persistent:&nbsp;</td>
 	<td>
 		<select name="setup_persistent">
 			<option value="0">No</option>
@@ -295,7 +321,7 @@
 
 <tr align="right">
     <td colspan="1">
-    <input type="hidden" value="Create VM" />
+    <input type="submit" value="Create VM" />
     </td>
 </tr>
 </table>
@@ -304,9 +330,10 @@
 
 <?php
   else:
-?>
-  <br /><a href="?name=<?php echo $_POST['name'] ?>">Machine details</a>
-<?php
+  		$name = $_POST['name'];
+		$res = $lv->get_domain_by_name($name);
+		$uuid = libvirt_domain_get_uuid_string($res);
+		echo "<br /><a href=\"?vmpage=dominfo&amp;uuid=$uuid\">Machine details</a>";
   endif;
 ?>
 	</div>
