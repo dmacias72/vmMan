@@ -43,7 +43,7 @@
 			return ($tmp) ? $tmp : $this->_set_last_error();
 		}
 
-		function domain_new($name, $img, $vcpus, $features, $mem, $maxmem, $clock, $nic, $disk, $persistent=true) {
+		function domain_new($name, $media, $drivers, $vcpus, $features, $mem, $maxmem, $clock, $nic, $disk, $usb, $persistent=true) {
 			$uuid = $this->domain_generate_uuid();
 			$emulator = $this->get_default_emulator();
 
@@ -54,20 +54,43 @@
 			for ($i = 0; $i < sizeof($features); $i++) {
 				$fs .= '<'.$features[$i].' />';
 			}
-
-			$diskstr = '';
-			if (!empty($disk)) {
-				if ($disk['size']) {
-					$disk['image'] = str_replace(' ', '_', $disk['image']);
-					if (!$this->create_image($disk['image'], $disk['size'], $disk['driver']))
-						return false;
+			$usbstr = '';
+			if (!empty($usb)) {
+				foreach($usb as $i => $v){
+					$usbx = explode(',', $v);	
+					$usbstr .="<hostdev mode='subsystem' type='usb' managed='no'>
+                          <source>
+                             <vendor id='".$usbx['0']."'/>
+                             <product id='".$usbx['1']."'/>
+                          </source>
+                       </hostdev>";
 				}
-
+			}
+			$diskstr = '';
+			if (!empty($disk['image'])) {
 				$diskstr = "<disk type='file' device='disk'>
 						<driver name='qemu' type='{$disk['driver']}' />
                                                 <source file='".base64_decode( $disk['image'])."'/>
-                                                <target bus='{$disk['bus']}' dev='hda' />
+                                                <target bus='{$disk['bus']}' dev='{$disk['dev']}' />
                                          </disk>";
+			}
+			$mediastr = '';
+			if (!empty($media)) {
+				$mediastr = "<disk type='file' device='cdrom'>
+						<driver name='qemu'/>
+						<source file='".base64_decode($media)."'/>
+						<target dev='sdc' bus='sata'/>
+						<readonly/>
+					</disk>";
+			}
+			$driverstr = '';
+			if (!empty($drivers)) {
+				$driverstr = "<disk type='file' device='cdrom'>
+						<driver name='qemu' type='raw'/>
+						<source file='".base64_decode($drivers)."'/>
+						<target dev='sdd' bus='sata'/>
+						<readonly/>
+					</disk>";
 			}
 			$netstr = '';
 			if (!empty($nic)) {
@@ -77,7 +100,7 @@
 				$netstr = "
 					    <interface type='bridge'>
 					      <mac address='{$nic['mac']}'/>
-					      <source bridge='{$nic['network']}'/>
+					      <source bridge='{$nic['net']}'/>
 					      $model
 					    </interface>";
 			}
@@ -107,12 +130,8 @@
 				<devices>
 					<emulator>$emulator</emulator>
 					$diskstr
-					<disk type='file' device='cdrom'>
-						<driver name='qemu'/>
-						<source file='".base64_decode($img)."'/>
-						<target dev='hdc' bus='ide'/>
-						<readonly/>
-					</disk>
+					$mediastr
+					$driverstr				
 					$netstr
 					<input type='mouse' bus='ps2'/>
 					<graphics type='vnc' port='-1' autoport='yes' websocket='-1' listen='0.0.0.0'>
@@ -122,9 +141,9 @@
 					<video>
 						<model type='cirrus'/>
 					</video>
+					$usbstr
 				</devices>
 				</domain>";
-
 			$tmp = libvirt_domain_create_xml($this->conn, $xml);
 			if (!$tmp)
 				return $this->_set_last_error();
@@ -165,7 +184,6 @@
 						</video>
 					</devices>
 					</domain>";
-				
 				$tmp = libvirt_domain_define_xml($this->conn, $xml);
 				return ($tmp) ? $tmp : $this->_set_last_error();
 			}
@@ -248,12 +266,12 @@
 				return $this->_set_last_error();
 		}
 
-                function domain_disk_add($domain, $img, $dev, $type='scsi', $driver='raw') {
-                        $dom = $this->get_domain_object($domain);
+      function domain_disk_add($domain, $img, $dev, $type='scsi', $driver='raw') {
+        $dom = $this->get_domain_object($domain);
 
-                        $tmp = libvirt_domain_disk_add($dom, $img, $dev, $type, $driver);
-                        return ($tmp) ? $tmp : $this->_set_last_error();
-                }
+        $tmp = libvirt_domain_disk_add($dom, $img, $dev, $type, $driver);
+        return ($tmp) ? $tmp : $this->_set_last_error();
+      }
 
 		function domain_change_numVCpus($domain, $num) {
 			$dom = $this->get_domain_object($domain);
@@ -708,6 +726,14 @@
 			return libvirt_storagepool_destroy($res);
 		}
 
+		function storagepool_is_active($res) {
+			return libvirt_storagepool_is_active($res);
+		}
+
+		function storagepool_refresh($res) {
+			return libvirt_storagepool_refresh($res, false);
+		}
+
 		function get_storagepool_res($res) {
 			if ($res == false)
 				return false;
@@ -735,7 +761,8 @@
 			if (!is_string($otmp2))
 				return $this->_set_last_error();
 			$tmp = libvirt_storagepool_get_info($res);
-			$tmp['volume_count'] = sizeof( libvirt_storagepool_list_volumes($res) );
+			if (libvirt_storagepool_is_active($res))
+				$tmp['volume_count'] = sizeof( libvirt_storagepool_list_volumes($res) );
 			$tmp['active'] = libvirt_storagepool_is_active($res);
 			$tmp['path'] = $path;
 			$tmp['permissions'] = $perms;
@@ -1315,10 +1342,14 @@
 		function domain_generate_uuid() {
 			$uuid = $this->generate_uuid();
 
-			while ($this->domain_get_name_by_uuid($uuid))
-				$uuid = $this->generate_uuid();
+			//while ($this->domain_get_name_by_uuid($uuid))
+				//$uuid = $this->generate_uuid();
 
 			return $uuid;
+		}
+
+		function storagepool_generate_uuid() {
+			return $this->generate_uuid();
 		}
 
 		function network_generate_uuid() {
