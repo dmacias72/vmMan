@@ -1,4 +1,4 @@
-<div class="wrap">
+	<div class="wrap">
 	<div class="list">
 <?php
   $skip = false;
@@ -8,57 +8,32 @@
   if (array_key_exists('sent', $_POST)) {
 	$features = array('apic', 'acpi', 'pae', 'hap');
 
-
-	$img = $_POST['install_img'];
-
 	$feature = array();
 	for ($i = 0; $i < sizeof($features); $i++)
 		if (array_key_exists('feature_'.$features[$i], $_POST))
 			$feature[] = $features[$i];
 
-	$nic = array();
-	if ($_POST['setup_nic']) {
-		$nic['mac'] = $_POST['nic_mac'];
-		$nic['type'] = $_POST['nic_type'];
-		$nic['network'] = $_POST['nic_net'];
-	}
-	$disk = array();
-	if ($_POST['setup_disk']) {
-		if ($_POST['new_vm_disk']) {
-			$disk['image'] = $_POST['name'].'.'.$_POST['disk_driver'];
-			$disk['size'] = (int)$_POST['new_img_data'];
-			$disk['bus'] = $_POST['disk_bus'];
-			$disk['driver'] = $_POST['disk_driver'];
-		}
-		else {
-			$disk['image'] = $_POST['img_data'];
-			$disk['size'] = 0;
-			$disk['bus'] = $_POST['disk_bus'];
-			$disk['driver'] = $_POST['disk_driver'];
-		}
-	}
-
-	$tmp = $lv->domain_new($_POST['name'], $img, $_POST['cpu_count'], $feature, $_POST['memory'], $_POST['maxmem'], $_POST['clock_offset'], $nic, $disk, $_POST['setup_persistent']);
+	$tmp = $lv->domain_new($_POST['name'], $_POST['media'], $_POST['drivers'], $_POST['cpu_count'], $feature, $_POST['memory'], $_POST['maxmem'], $_POST['clock_offset'], $_POST['nic'], $_POST['disk'], $_POST['usb'], $_POST['setup_persistent']);
 	if (!$tmp)
 		$msg = $lv->get_last_error();
 	else {
 		$skip = true;
-		$msg = "New virtual machine has been created successfully";
+  		$name = $_POST['name'];
+		$res = $lv->get_domain_by_name($name);
+		$uuid = libvirt_domain_get_uuid_string($res);
+		$msg = "New virtual machine <a href=\"?vmpage=dominfo&amp;uuid=$uuid\">$name&nbsp;</a> has been created successfully";
 	}
   }
 
   $ci  = $lv->get_connect_information();
   $maxcpu = $ci['hypervisor_maxvcpus'];
   unset($ci);
+  if (!$msg)
+	$msg = "none"
 ?>
 
-<?php
-    if ($msg):
-?>
-    <div id="msg"><b>Message:&nbsp; </b><?php echo $msg ?></div>
-<?php
-    endif;
-?>
+	<div class="section"><h3>Create a new Virtual Machine</h3></div>
+	<div id="msg"><b>message:&nbsp;</b><?php echo $msg ?></div>
 
 <?php
     if (!$skip):
@@ -108,8 +83,6 @@
 
 <div id="content">
 
-<div class="section"><h3>Create a new Virtual Machine</h3></div>
-
 <form method="POST">
 
 <table id="form-table">
@@ -119,13 +92,14 @@
 </tr>
 
 <tr>
-    <td align="right">Install media (cdrom):&nbsp; </td>
+    <td align="right">Install image (iso):&nbsp; </td>
     <td>
-		<select name="install_img" title="cdrom or media image used for installing operating system">
+		<select name="media" title="cdrom or media image used for installing operating system">
 <?php
 	if(!$pools) 
-		echo "<option value=\"false\">No Storage Pools</option>";
+		echo "<option value=\"\">No Storage Pools</option>";
 	else {
+		echo '<option value="" selected>none selected</option>';
 		for ($i = 0; $i < sizeof($pools); $i++) {
 			$pname = $pools[$i];
 			$info = $lv->get_storagepool_info($pname);
@@ -136,8 +110,10 @@
 				$tmp_keys = array_keys($tmp);
 				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
 					$vname = $tmp_keys[$ii];
-					$vpath = base64_encode($tmp[$vname]['path']);
-					echo "<option value=\"$vpath\">$vname</option>";
+					$vpath = $tmp[$vname]['path'];
+					$ext = pathinfo($vpath, PATHINFO_EXTENSION);
+					if ($ext == "iso")
+						echo '<option value="'.base64_encode($vpath).'">'.$vname.'</option>';
 				}
 			}
 		}	
@@ -145,6 +121,40 @@
 ?>
 		</select>
 	</td>
+</tr>
+
+<tr>
+    <td align="right">drivers image (iso):&nbsp; </td>
+    <td>
+		<select name="drivers" title="cdrom or media image used for installing operating system drivers">
+<?php
+	if(!$pools) 
+		echo "<option value=\"\">No Storage Pools</option>";
+	else {
+		echo '<option value="" selected>none selected</option>';
+		for ($i = 0; $i < sizeof($pools); $i++) {
+			$pname = $pools[$i];
+			$info = $lv->get_storagepool_info($pname);
+			if (!$info['volume_count'] > 0) 
+				echo "<option value=\"false\">No Storage Volumes</option>";
+			else {
+				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
+				$tmp_keys = array_keys($tmp);
+				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
+					$vname = $tmp_keys[$ii];
+					$vpath = $tmp[$vname]['path'];
+					$ext = pathinfo($vpath, PATHINFO_EXTENSION);
+					if ($ext == "iso")
+						echo '<option value="'.base64_encode($vpath).'">'.$vname.'</option>';
+				}
+			}
+		}	
+	}
+?>
+		</select>
+	</td>
+</tr>
+
 
 <tr>
     <td align="right">vCPUs:&nbsp; </td>
@@ -186,127 +196,104 @@
         </select>
     </td>
 </tr>
-
+<tr align="right"><td><b>Network settings:</b></td></tr>
 <tr>
-    <td align="right">Setup Network:&nbsp;</td>
-    <td>
-      <select name="setup_nic" onchange="change_divs('network', this.value)">
-	<option value="1">Yes</option>
-	<option value="0">No</option>
-      </select>
-    </td>
+   <td align="right">MAC:&nbsp;</td>
+   <td>
+		<input type="text" name="nic[mac]" title="random mac, you can supply your own" value="<?php echo $lv->generate_random_mac_addr() ?>" id="nic_mac_addr" />
+	</td>
 </tr>
-
-<tr id="setup_network" style="display: table-row">
-    <td>&nbsp;</td>
-    <td>
-        <table>
-            <tr>
-                <td align="left">MAC:&nbsp;&nbsp;&nbsp;&nbsp;
-			<input type="text" name="nic_mac" title="random mac, you can supply your own" value="<?php echo $lv->generate_random_mac_addr() ?>" id="nic_mac_addr" />
-		</td>
-            </tr>
-            <tr>
-                 <td align="left">NIC:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                     <select name="nic_type" title="virtio unless passing through nic">';
-
+<tr>
+   <td align="right">NIC:&nbsp;</td>
+   <td>
+   	<select name="nic[type]" title="virtio unless passing through nic">
 <?php
 	$models = $lv->get_nic_models();
         for ($i = 0; $i < sizeof($models); $i++)
                 echo '<option value="'.$models[$i].'">'.$models[$i].'</option>';
 ?>
-                     </select>
-                 </td>
-            </tr>
-            <tr>
-   	         <td align="left" >Bridge:&nbsp;
-	        			<input type="text" value="<?=$network_cfg['BRNAME'];?>" name="nic_net" placeholder="name of bridge in unRAID" title="name of bridge in unRAID automatically filled in" />			
-              </td>
-            </tr>
-        </table>
-    </td>
-</tr>
-
-<tr>
-    <td align="right">Setup disk:&nbsp;</td>
-    <td>
-      <select name="setup_disk" onchange="change_divs('disk', this.value)">
-        <option value="1">Yes</option>
-        <option value="0">No</option>
       </select>
-    </td>
+   </td>
+</tr>
+<tr>
+   <td align="right" >Bridge:&nbsp;</td>
+   <td>
+		<input type="text" value="<?=$network_cfg['BRNAME'];?>" name="nic[net]" placeholder="name of bridge in unRAID" title="name of bridge in unRAID automatically filled in" />			
+   </td>
 </tr>
 
-<tr id="setup_disk" style="display: table-row">
-    <td>&nbsp;</td>
-    <td>
-        <table>
-            <tr>
-                <td align="left" hidden>VM disk:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		    <select name="new_vm_disk" onchange="vm_disk_change(this.value)" disabled hidden>
-			<option value="0">Use existing disk image</option>
-			<option value="1">Create new disk image</option>
-		    </select>
-		</td>
-	    </tr>
-            <tr id="vm_disk_existing">
-		<td align="left">Disk image:&nbsp;
-		<select name="img_data" title="select domain image to use for virtual machine">
+<tr align="right"><td><b>Disk settings:</b></td></tr>
+<tr>
+	<td align="right">Disk image:&nbsp;</td>
+	<td>
+		<select name="disk[image]" title="select domain image to use for virtual machine">
 <?php
 	if(!$pools) 
-		echo "<option value=\"false\">No Storage Pools</option>";
+		echo '<option value="">No Storage Pools</option>';
 	else {
+		echo '<option value="" selected>none selected</option>';
 		for ($i = 0; $i < sizeof($pools); $i++) {
 			$pname = $pools[$i];
 			$info = $lv->get_storagepool_info($pname);
 			if (!$info['volume_count'] > 0) 
-				echo "<option value=\"false\">No Storage Volumes</option>";
+				echo '<option value="false">No Storage Volumes</option>';
 			else {
 				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
 				$tmp_keys = array_keys($tmp);
 				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
 					$vname = $tmp_keys[$ii];
-					$vpath = base64_encode($tmp[$vname]['path']);
-					echo "<option value=\"$vpath\">$vname</option>";
+					$vpath = $tmp[$vname]['path'];
+					$ext = pathinfo($vpath, PATHINFO_EXTENSION);
+					if ($ext != "iso")
+						echo '<option value="'.base64_encode($vpath).'">'.$vname.'</option>';
 				}
 			}
 		}	
 	}
 ?>
-			</select>
-		</td>
-	    </tr>
-       <tr id="vm_disk_create" style="display: none">
-		<td align="left">Disk (GB):&nbsp;&nbsp;&nbsp;&nbsp;
-			<input type="text" name="new_img_data" />			
-		</td>
-	    </tr>
-
-	    <tr>
-		<td align="left">Disk bus:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		    <select name="disk_bus" title="virtio unless passing through controller" >
+		</select>
+	</td>
+</tr>
+<tr>
+	<td align="right">Disk bus:&nbsp;</td>
+	<td>
+		<select name="disk[bus]" title="virtio unless passing through controller" >
 			<option value="virtio">virtio</option>
 			<option value="scsi">SCSI</option>
 			<option value="ide">IDE</option>
-		    </select>
-		</td>
-	    </tr>
-	    <tr>
-		<td align="left">Disk type:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		    <select name="disk_driver" title="type of storage image">
+		</select>
+	</td>
+</tr>
+<tr>
+	<td align="right">Disk type:&nbsp;</td>
+	<td>
+	   <select name="disk[driver]" title="type of storage image">
 			<option value="qcow2">qcow2</option>
 			<option value="raw">raw</option>
 			<option value="qcow">qcow</option>
-		    </select>
-		</td>
-	    </tr>
-	    <tr>
-		<td align="left">Domain device:&nbsp;
-		hda</td>
-	    </tr>
-	</table>
-    </td>
+	   </select>
+	</td>
 </tr>
+<tr>
+	<td align="right">Disk name:&nbsp;</td>
+	<td>
+		<input type="text" value="hda" name="disk[dev]" placeholder="name of disk inside vm" title="name of disk inside vm" />
+	</td>
+</tr>
+
+<tr><td align="right"><b>USB devices:&nbsp;</b></td>
+	<td align="left">
+<?php
+	$tmp = $lv->get_node_devices('usb_device');
+	for ($i = 0; $i < sizeof($tmp); $i++) {
+		$tmp2 = $lv->get_node_device_information($tmp[$i]);
+		if (array_key_exists('vendor_id', $tmp2) && array_key_exists('product_id', $tmp2) && array_key_exists('product_name', $tmp2))
+			echo '<input class="checkbox" type="checkbox" value="'.$tmp2['vendor_id'].','.$tmp2['product_id'].'" name="usb['.$i.']" />'.$tmp2['product_name'].'<br />';
+    }
+?>
+  	</td>
+</tr>
+
 <tr>
 	<td align="right">Persistent:&nbsp;</td>
 	<td>
@@ -329,11 +316,6 @@
 </form>
 
 <?php
-  else:
-  		$name = $_POST['name'];
-		$res = $lv->get_domain_by_name($name);
-		$uuid = libvirt_domain_get_uuid_string($res);
-		echo "<br /><a href=\"?vmpage=dominfo&amp;uuid=$uuid\">Machine details</a>";
   endif;
 ?>
 	</div>
