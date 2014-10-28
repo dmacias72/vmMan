@@ -31,8 +31,11 @@
 				}
 
 				$tmp = $lv->get_networks(VIR_NETWORKS_ALL);
+				if (!$msg)
+					$msg="none";
 
 				echo "<h3>Network Information</h3>
+					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
 					<table class='table table-striped'>
  	        			<tr>
    	      			<th> Network name </th>
@@ -74,9 +77,6 @@
       			</tr>";
 				}
 			echo "</table>";
-
-			if ($msg)
-				echo "<pre>$msg</pre>";
 			?>
 		</div>
 	</div>
