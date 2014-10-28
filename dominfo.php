@@ -3,7 +3,8 @@
      	<?php
       $subaction = array_key_exists('subaction', $_GET) ? $_GET['subaction'] : false;
       $msg = false;
-      $domName = $lv->domain_get_name_by_uuid($_GET['uuid']);
+		$uuid = $_GET['uuid'];
+      $domName = $lv->domain_get_name_by_uuid($uuid);
       $res = $lv->get_domain_object($domName);
 		$domtype = $lv->get_domain_type($domName);
 		$emulator = $lv->get_domain_emulator($domName);        
@@ -22,11 +23,12 @@
       $vncport = $lv->domain_get_vnc_port($res);
       $wsport = (int)$vncport -200;
 		if ($vncport < 0){
-        	$vnc = '-';
+        	$vnc = "";
         	$wsport= '-';
       }else
-         $vnc = '/plugins/vmMan/vnc_auto.html?autoconnect=true&host='.gethostname().'&port='.$wsport;
-
+         $vnc ="<a href=\"#\" onClick=\"window.open('/plugins/vmMan/vnc_auto.html?autoconnect=true&host=".gethostname()."&port=".$wsport.
+         "','_blank','scrollbars=yes,resizable=yes'); return false;\" 
+         title=\"open VNC connection\"><i class=\"glyphicon glyphicon-eye-open\"></i></a>";
       if (!$id)
           $id = 'N/A';
       if ($vncport <= 0)
@@ -72,14 +74,14 @@
            					<b>Domain state: </b><font color=\"$scolor\">$state<br /></font>
            					<b>Domain architecture: </b>$arch<br />
            					<b>Domain ID: </b>$id<br />
-           					<b>WS Port: </b>$wsport&nbsp;&nbsp;<a href=\"#\" onClick=\"window.open('$vnc','_blank','scrollbars=yes,resizable=yes'); return false;\" 
-      	  			title=\"open VNC connection\"><i class=\"glyphicon glyphicon-eye-open\"></i></a><br />
+           					<b>WS Port: </b>$wsport&nbsp;&nbsp;$vnc<br />
            				</td>
 	        			</tr>
            		</table>";
 
 			//* Disk information */
-         echo "<h4><b>Disk devices</b><a href=\"?vmpage=dominfo&amp;uuid={$_GET['uuid']}&amp;subaction=disk-add\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
+         echo "<h4><b>Disk devices</b>";
+         //<a href=\"?vmpage=dominfo&amp;uuid=$uuid&amp;subaction=disk-add\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
          $tmp = $lv->get_disk_stats($domName);
 
          if (!empty($tmp)) {
