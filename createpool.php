@@ -1,7 +1,7 @@
 <div class="wrap">
 	<div class="list">
 			<h3>Create a new storage in pool</h3>
-				<form method="POST" action="?vmpage=storage&amp;subaction=pool-save">
+				<form method="POST" action="?vmpage=storage&amp;subaction=pool-create">
 					<table>
 						<tr align="left">
 							<td align="right">Storage name:&nbsp;</td>
@@ -9,7 +9,7 @@
 						</tr>
 						<tr align="left">
 							<td align="right">Location:&nbsp;</td>
-							<td align="left"><input type="text" name="ppath" placeholder="e.g. /mnt/cache/images"></td>
+							<td align="left"><input type="text" name="ppath" placeholder="Will be created if doesn't exist e.g. /mnt/cache/images "></td>
 						</tr>
 						<tr align="right">
 							<td align="left"></td>
