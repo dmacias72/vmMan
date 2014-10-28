@@ -68,6 +68,8 @@
            	}
 			}
 		}
+	if (!$ret)
+		$ret = "none";
    $doms = $lv->get_domains();
    $domkeys = array_keys($doms);
   	$tmp = $lv->get_domain_count();
@@ -75,8 +77,8 @@
 	echo "<div class=\"wrap\">
 				<div class=\"list\">
 					<h3>Virtual Machine Information</h3>			
+						<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$ret</div><div style=\"width: 32%; float:right\"><b>statistics</b> - {$tmp['total']} <b>domains</b>, {$active} <b>active</b>, {$tmp['inactive']} inactive</div>
 					<table class=\"table table-striped\">
-						<p>Statistics - {$tmp['total']} domains, {$active} active, {$tmp['inactive']} inactive</p>
   	      			<tr>
   		          		<th>Name</th>
    	         	   <th>CPU#</th>
@@ -176,8 +178,6 @@
 		}
 	}
 	echo "</td></tr></table></div>";
-	if ($ret)
-		echo $ret;
 	if ($clrh) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs'); </script>";
 ?>
 	</div>
