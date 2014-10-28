@@ -5,7 +5,7 @@
 					<table>
 						<tr align="left">
 							<td align="right">Volume name:&nbsp;</td>
-							<td align="left"><input type="text" name="vname" placeholder="Name of volume"></td>
+							<td align="left"><input type="text" name="vname" title="name of volume" placeholder="Name of volume plus extension e.g. ubuntu.qcow2"></td>
 						</tr>
 						<tr align="left">
 							<td align="right">Capacity:&nbsp;</td>
