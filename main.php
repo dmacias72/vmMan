@@ -126,7 +126,7 @@
         	$vnc = '-';
         	$wsport= '-';
       }else
-         $vnc = '/plugins/vmMan/vnc_auto.html?autoconnect=true&host='.gethostname().'&port='.$wsport;
+         $vnc = '/plugins/vmMan/vnc.html?autoconnect=true&host='.gethostname().'&port='.$wsport;
       
       unset($tmp);
       if (!$id)
