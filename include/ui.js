@@ -182,13 +182,13 @@ var UI;
             $D("sendTabButton").onclick = UI.sendTab;
             $D("sendEscButton").onclick = UI.sendEsc;
 
-            $D("sendCtrlAltDelButton").onclick = UI.sendCtrlAltDel;
-            $D("xvpShutdownButton").onclick = UI.xvpShutdown;
-            $D("xvpRebootButton").onclick = UI.xvpReboot;
-            $D("xvpResetButton").onclick = UI.xvpReset;
+            //$D("sendCtrlAltDelButton").onclick = UI.sendCtrlAltDel;
+            //$D("xvpShutdownButton").onclick = UI.xvpShutdown;
+            //$D("xvpRebootButton").onclick = UI.xvpReboot;
+            //$D("xvpResetButton").onclick = UI.xvpReset;
             $D("noVNC_status").onclick = UI.togglePopupStatusPanel;
             $D("noVNC_popup_status_panel").onclick = UI.togglePopupStatusPanel;
-            $D("xvpButton").onclick = UI.toggleXvpPanel;
+            //$D("xvpButton").onclick = UI.toggleXvpPanel;
             $D("clipboardButton").onclick = UI.toggleClipboardPanel;
             $D("settingsButton").onclick = UI.toggleSettingsPanel;
             $D("connectButton").onclick = UI.toggleConnectPanel;
@@ -605,7 +605,7 @@ var UI;
                 $D('clipboardButton').style.display = "inline";
                 $D('showKeyboard').style.display = "inline";
                 $D('noVNC_extra_keys').style.display = "";
-                $D('sendCtrlAltDelButton').style.display = "inline";
+                //$D('sendCtrlAltDelButton').style.display = "inline";
             } else {
                 UI.setMouseButton();
                 $D('clipboardButton').style.display = "none";
