@@ -2,7 +2,7 @@
   	<div class="list">
      	<?php
       $subaction = array_key_exists('subaction', $_GET) ? $_GET['subaction'] : false;
-      $msg = false;
+      $msg = "none";
 		$uuid = $_GET['uuid'];
       $domName = $lv->domain_get_name_by_uuid($uuid);
       $res = $lv->get_domain_object($domName);
@@ -26,7 +26,7 @@
         	$vnc = "";
         	$wsport= '-';
       }else
-         $vnc ="<a href=\"#\" onClick=\"window.open('/plugins/vmMan/vnc_auto.html?autoconnect=true&host=".gethostname()."&port=".$wsport.
+         $vnc ="<a href=\"#\" onClick=\"window.open('/plugins/vmMan/vnc.html?autoconnect=true&host=".gethostname()."&port=".$wsport.
          "','_blank','scrollbars=yes,resizable=yes'); return false;\" 
          title=\"open VNC connection\"><i class=\"glyphicon glyphicon-eye-open\"></i></a>";
       if (!$id)
@@ -61,8 +61,15 @@
 				$msg = 'Cannot add NIC to the guest: '.$lv->get_last_error();
 		}
 
-         echo "<h3> Domain Information - $domName</h3>
-           		<table class=\"table table-striped\">
+         echo "<h3> Domain Information - ";
+      if ($lv->domain_is_running($res, $name))
+			echo "<a href=\"#\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid&amp;view=readonly'\" 
+		  		title=\"view domain XML\">$domName</a>";
+		else
+      	echo "<a href=\"#\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid&amp;view='\" 
+		  		title=\"edit domain XML\">$domName</a>";         
+         echo	"</h3><div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
+         		<table class=\"table table-striped\">
            			<tr>
            				<td>
            					<b>Domain type: </b>$domtype<br />
@@ -80,10 +87,8 @@
            		</table>";
 
 			//* Disk information */
-         echo "<h4><b>Disk devices</b>";
-         //<a href=\"?vmpage=dominfo&amp;uuid=$uuid&amp;subaction=disk-add\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
+         echo "<h4><b>Disk devices</b><a href=\"?vmpage=dominfo&amp;uuid=$uuid&amp;subaction=disk-add\" title=\"not working yet\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
          $tmp = $lv->get_disk_stats($domName);
-
          if (!empty($tmp)) {
             echo "<table class='table table-striped'>
          				<tr>
@@ -123,8 +128,7 @@
 
 			/* Network interface information */
          echo "<h4><b>Network devices</b></h4>";
-         // $tmp = $lv->get_nic_info($domName);
-         $tmp = null;
+         $tmp = $lv->get_nic_info($res);
          if (!empty($tmp)) {
          	$anets = $lv->get_networks(VIR_NETWORKS_ACTIVE);
 
@@ -139,7 +143,7 @@
 
 				for ($i = 0; $i < sizeof($tmp); $i++) {
    	      	//if (in_array($tmp[$i]['network'], $anets))
-      	      //	$netUp = 'Yes';
+      	      	$netUp = 'Yes';
          	   //else
       			//	$netUp = 'No <a href="?action=virtual-networks&amp;subaction=start&amp;name='.$tmp[$i]['network'].'">[Start]</a>';
 
@@ -148,14 +152,14 @@
                   	   <td align=\"left\">{$tmp[$i]['nic_type']}</td>
                      	<td align=\"left\">{$tmp[$i]['network']}</td>
 	                     <td align=\"left\">$netUp</td>
-   	                  <td align=\"left\">
-      	               	<a href=\"?action=$action&amp;uuid={$_GET['uuid']}&amp;subaction=nic-remove&amp;mac={$tmp[$i]['mac']}\">
-         	               Remove network card</a>
-            	         </td>                               
+   	                  <td align=\"left\">"
+//      	               	<a href=\"?action=$action&amp;uuid={$_GET['uuid']}&amp;subaction=nic-remove&amp;mac={$tmp[$i]['mac']}\">
+//         	               Remove network card</a>
+            	         ."</td>                               
                	   </tr>";
 				}
          	echo "</table>";
-         	echo "<br /><a href=\"?action=$action&amp;uuid={$_GET['uuid']}&amp;subaction=nic-add\">Add new network card</a>";
+         	//echo "<br /><a href=\"?action=$action&amp;uuid={$_GET['uuid']}&amp;subaction=nic-add\">Add new network card</a>";
          }
          else
          	echo 'Domain doesn\'t have any network devices';
@@ -163,8 +167,6 @@
          //if ( $dom['state'] == 1 ) {
          //    echo "<h3>Screenshots</h3><img src=\"screenshot.php?uuid={$_GET['uuid']}\">";
          //}
-      	if ($msg)
-		echo $msg;
       ?>
     	</div>
 	</div>
