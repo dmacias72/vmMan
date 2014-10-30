@@ -105,7 +105,8 @@
 					      $model
 					    </interface>";
 			}
-			if (!empty($shares)) {
+			$sharestr = '';
+			if (!empty($shares['source']) && !empty($shares['target']) ) {
 					$sharestr = "<filesystem type='mount' accessmode='passthrough'>
          						<source dir='".$shares['source']."'/>
       							<target dir='".$shares['target']."'/>
@@ -592,7 +593,7 @@
 				return $this->_set_last_error();
 			$ret = array();
 			for ($i = 0; $i < $macs['num']; $i++) {
-				if ($net != 'bridge')
+				if ($net[$i] != 'bridge')
 					$tmp = libvirt_domain_get_network_info($res, $macs[$i]);
 				if ($tmp)
 					$ret[] = $tmp;
