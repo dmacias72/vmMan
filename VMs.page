@@ -11,7 +11,7 @@ Type="xmenu"
   	 	      	<button class="btn btn-success" 
 		 	      	onclick="javascript:location.href='?vmpage=main'" 
   		 	      	title="main page"><i class="glyphicon glyphicon-home">
-	 	      	</i>&#32;Main</button>
+	 	      	</i>&#32;VMs</button>
 	 	      </div>
 	 	      <div class="btn-group">
 	 	      	<button class="btn btn-info" 
@@ -52,7 +52,7 @@ Type="xmenu"
 			</div>      	
      	</p>
 <?php
-   error_reporting(0);
+   //error_reporting(0);
    require('/usr/local/emhttp/plugins/vmMan/libvirt.php');
 	$uri = 'qemu:///system';
    $lv = new Libvirt($uri, null, null, false);
