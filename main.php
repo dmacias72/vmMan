@@ -37,7 +37,7 @@
 			$clrh=true; }
 		elseif ($action == 'domain-stop') {
          $ret = $lv->domain_shutdown($domName) ? 
-         	"Domain $domName has been successfullyc stopped" : 
+         	"Domain $domName has been successfully stopped" : 
          	'Error while stopping domain: '.$lv->get_last_error();
         	$clrh = true; }
       elseif ($action == 'domain-destroy') {
