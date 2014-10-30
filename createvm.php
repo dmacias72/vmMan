@@ -13,7 +13,7 @@
 		if (array_key_exists('feature_'.$features[$i], $_POST))
 			$feature[] = $features[$i];
 
-	$tmp = $lv->domain_new($_POST['name'], $_POST['media'], $_POST['drivers'], $_POST['cpu_count'], $feature, $_POST['memory'], $_POST['maxmem'], $_POST['clock_offset'], $_POST['nic'], $_POST['disk'], $_POST['usb'], $_POST['setup_persistent']);
+	$tmp = $lv->domain_new($_POST['name'], $_POST['media'], $_POST['drivers'], $_POST['cpu_count'], $feature, $_POST['memory'], $_POST['maxmem'], $_POST['clock_offset'], $_POST['nic'], $_POST['disk'], $_POST['usb'], $_POST['usbtab'], $_POST['shares'], $_POST['setup_persistent']);
 	if (!$tmp)
 		$msg = $lv->get_last_error();
 	else {
@@ -284,6 +284,7 @@
 <tr><td align="right"><b>USB devices:&nbsp;</b></td>
 	<td align="left">
 <?php
+	echo '<input class="checkbox" type="checkbox" name="usbtab" value="1" title="mouse coordinates in vm match the pointer position on the real desktop" />USB tablet (Enable For OS with GUI)<br />';
 	$tmp = $lv->get_node_devices('usb_device');
 	for ($i = 0; $i < sizeof($tmp); $i++) {
 		$tmp2 = $lv->get_node_device_information($tmp[$i]);
@@ -294,6 +295,21 @@
   	</td>
 </tr>
 
+<tr align="right"><td><b>Share settings:</b></td></tr>
+
+<tr>
+	<td align="right">unRAID share:&nbsp;</td>
+	<td>
+		<input type="text" value="" name="shares[source]" placeholder="e.g. /mnt/user...(won't work with windows)" title="path of unRAID share" />
+	</td>
+</tr>
+
+<tr>
+	<td align="right">Mount tag:&nbsp;</td>
+	<td>
+		<input type="text" value="" name="shares[target]" placeholder="e.g. shares (name of mount tag inside vm)" title="mount tag inside vm " />
+	</td>
+</tr>
 <tr>
 	<td align="right">Persistent:&nbsp;</td>
 	<td>
