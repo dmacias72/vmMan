@@ -155,6 +155,15 @@
 	</td>
 </tr>
 
+<tr>
+	<td align="right">Persistent:&nbsp;</td>
+	<td>
+		<select name="setup_persistent" title="Select domain to be persistent or temporary">
+			<option value="0">No</option>
+			<option value="1" selected="selected">Yes</option>
+		</select>
+	</td>
+</tr>
 
 <tr>
     <td align="right">vCPUs:&nbsp; </td>
@@ -295,7 +304,7 @@
   	</td>
 </tr>
 
-<tr align="right"><td><b>Share settings:</b></td></tr>
+<tr align="right"><td><b>9p Share Settings:&nbsp;</b></td><td align="left"><b>for linux VM's</b?</td></tr>
 
 <tr>
 	<td align="right">unRAID share:&nbsp;</td>
@@ -307,16 +316,7 @@
 <tr>
 	<td align="right">Mount tag:&nbsp;</td>
 	<td>
-		<input type="text" value="" name="shares[target]" placeholder="e.g. shares (name of mount tag inside vm)" title="mount tag inside vm " />
-	</td>
-</tr>
-<tr>
-	<td align="right">Persistent:&nbsp;</td>
-	<td>
-		<select name="setup_persistent">
-			<option value="0">No</option>
-			<option value="1" selected="selected">Yes</option>
-		</select>
+		<input type="text" value="" name="shares[target]" placeholder="e.g. shares (name of mount tag inside vm)" title="mount tag inside vm" />
 	</td>
 </tr>
 
