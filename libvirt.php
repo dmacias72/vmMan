@@ -43,7 +43,7 @@
 			return ($tmp) ? $tmp : $this->_set_last_error();
 		}
 
-		function domain_new($name, $media, $drivers, $vcpus, $features, $mem, $maxmem, $clock, $nic, $disk, $usb, $persistent=true) {
+		function domain_new($name, $media, $drivers, $vcpus, $features, $mem, $maxmem, $clock, $nic, $disk, $usb, $usbtab, $shares, $persistent=true) {
 			$uuid = $this->domain_generate_uuid();
 			$emulator = $this->get_default_emulator();
 
@@ -60,12 +60,13 @@
 					$usbx = explode(',', $v);	
 					$usbstr .="<hostdev mode='subsystem' type='usb' managed='no'>
                           <source>
-                             <vendor id='".$usbx['0']."'/>
-                             <product id='".$usbx['1']."'/>
+                             <vendor id='".$usbx[0]."'/>
+                             <product id='".$usbx[1]."'/>
                           </source>
                        </hostdev>";
 				}
 			}
+			($usbtab) ? $usbtabstr = "<input type='tablet' bus='usb'/>" : $usbtabstr = '';
 			$diskstr = '';
 			if (!empty($disk['image'])) {
 				$diskstr = "<disk type='file' device='disk'>
@@ -104,6 +105,13 @@
 					      $model
 					    </interface>";
 			}
+			if (!empty($shares)) {
+					$sharestr = "<filesystem type='mount' accessmode='passthrough'>
+         						<source dir='".$shares['source']."'/>
+      							<target dir='".$shares['target']."'/>
+                           </filesystem>";
+				
+			}
 
 			$xml = "<domain type='kvm'>
 				<name>$name</name>
@@ -132,7 +140,9 @@
 					$diskstr
 					$mediastr
 					$driverstr				
+					$sharestr
 					$netstr
+               $usbtabstr
 					<input type='mouse' bus='ps2'/>
 					<graphics type='vnc' port='-1' autoport='yes' websocket='-1' listen='0.0.0.0'>
 						<listen type='address' address='0.0.0.0'/>
@@ -173,7 +183,10 @@
 					<devices>
 						<emulator>$emulator</emulator>
 						$diskstr
+						$driverstr				
+						$sharestr
 						$netstr
+						$usbtabstr
 						<input type='mouse' bus='ps2'/>
 						<graphics type='vnc' port='-1' autoport='yes' websocket='-1' listen='0.0.0.0'>
 							<listen type='address' address='0.0.0.0'/>
@@ -529,7 +542,7 @@
 			$buses =  $this->get_xpath($dom, '//domain/devices/disk[@device="disk"]/target/@bus', false);
 			$disks =  $this->get_xpath($dom, '//domain/devices/disk[@device="disk"]/target/@dev', false);
 			$files =  $this->get_xpath($dom, '//domain/devices/disk[@device="disk"]/source/@file', false);
-
+		
 			$ret = array();
 			for ($i = 0; $i < $disks['num']; $i++) {
 				$tmp = libvirt_domain_get_block_info($dom, $disks[$i]);
@@ -571,16 +584,15 @@
 			return $ret;
 		}
 
-                function get_nic_info($domain) {
-                        $dom = $this->get_domain_object($domain);
-
-                        $macs =  $this->get_xpath($dom, '//domain/devices/interface/mac/@address', false);
+      function get_nic_info($res) {
+         $macs =  $this->get_xpath($res, "//domain/devices/interface/mac/@address", false);
 			if (!$macs)
 				return $this->_set_last_error();
-
+ 			$net = $this->domain_get_interface_devices($res);
 			$ret = array();
 			for ($i = 0; $i < $macs['num']; $i++) {
-				$tmp = libvirt_domain_get_network_info($dom, $macs[$i]);
+				if (!in_array('vnet1', $net))
+					$tmp = libvirt_domain_get_network_info($res, $macs[$i]);
 				if ($tmp)
 					$ret[] = $tmp;
 				else {
@@ -588,40 +600,40 @@
 
 					$ret[] = array(
 							'mac' => $macs[$i],
-							'network' => '-',
-							'nic_type' => '-'
+							'network' => 'vnet1',
+							'nic_type' => 'virtio'
 							);
 				}
 			}
 
-                        return $ret;
-                }
+        return $ret;
+       }
 
-                function get_domain_type($domain) {
-                        $dom = $this->get_domain_object($domain);
+      function get_domain_type($domain) {
+         $dom = $this->get_domain_object($domain);
 
-                        $tmp = $this->get_xpath($dom, '//domain/@type', false);
-                        if ($tmp['num'] == 0)
-                            return $this->_set_last_error();
+         $tmp = $this->get_xpath($dom, '//domain/@type', false);
+         if ($tmp['num'] == 0)
+            return $this->_set_last_error();
 
-                        $ret = $tmp[0];
-                        unset($tmp);
+         $ret = $tmp[0];
+         unset($tmp);
 
-                        return $ret;
-                }
+         return $ret;
+      }
 
-                function get_domain_emulator($domain) {
-                        $dom = $this->get_domain_object($domain);
+      function get_domain_emulator($domain) {
+         $dom = $this->get_domain_object($domain);
 
-                        $tmp =  $this->get_xpath($dom, '//domain/devices/emulator', false);
-                        if ($tmp['num'] == 0)
-                            return $this->_set_last_error();
+         $tmp =  $this->get_xpath($dom, '//domain/devices/emulator', false);
+            if ($tmp['num'] == 0)
+               return $this->_set_last_error();
 
-                        $ret = $tmp[0];
-                        unset($tmp);
+          $ret = $tmp[0];
+          unset($tmp);
 
-                        return $ret;
-                }
+          return $ret;
+      }
 
 		function get_network_cards($domain) {
 			$dom = $this->get_domain_object($domain);
@@ -1241,7 +1253,7 @@
 			return ($tmp) ? $tmp : $this->_set_last_error();
 		}
 
-		function domain_get_interface_stats($nameRes, $iface) {
+		function domain_get_interface_stats($domain, $iface) {
 			$dom = $this->get_domain_object($domain);
 			if (!$dom)
 				return false;
@@ -1250,6 +1262,11 @@
 			return ($tmp) ? $tmp : $this->_set_last_error();
 		}
 
+		function domain_get_interface_devices($res) {
+			$tmp = libvirt_domain_get_interface_devices($res);
+			return ($tmp) ? $tmp : $this->_set_last_error();
+		}
+		
 		function domain_get_memory_stats($domain) {
 			$dom = $this->get_domain_object($domain);
 			if (!$dom)
