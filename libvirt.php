@@ -585,22 +585,22 @@
 		}
 
       function get_nic_info($res) {
-         $macs =  $this->get_xpath($res, "//domain/devices/interface/mac/@address", false);
+         $macs = $this->get_xpath($res, "//domain/devices/interface/mac/@address", false);
+			$net = $this->get_xpath($res, "//domain/devices/interface/@type", false);
+			$bridge = $this->get_xpath($res, "//domain/devices/interface/source/@bridge", false);
 			if (!$macs)
 				return $this->_set_last_error();
- 			$net = $this->domain_get_interface_devices($res);
 			$ret = array();
 			for ($i = 0; $i < $macs['num']; $i++) {
-				if (!in_array('vnet1', $net))
+				if ($net != 'bridge')
 					$tmp = libvirt_domain_get_network_info($res, $macs[$i]);
 				if ($tmp)
 					$ret[] = $tmp;
 				else {
 					$this->_set_last_error();
-
 					$ret[] = array(
 							'mac' => $macs[$i],
-							'network' => 'vnet1',
+							'network' => $bridge[$i],
 							'nic_type' => 'virtio'
 							);
 				}
