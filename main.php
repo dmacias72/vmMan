@@ -2,7 +2,7 @@
 	<div class="list">
 		
 <?php
-	$ret = false;
+	$ret = "none";
 	$clrh = false;
    if ($action) {
      	$domName = $lv->domain_get_name_by_uuid($uuid);
@@ -68,15 +68,13 @@
            	}
 			}
 		}
-	if (!$ret)
-		$ret = "none";
    $doms = $lv->get_domains();
    $domkeys = array_keys($doms);
   	$tmp = $lv->get_domain_count();
    $active = $tmp['active'];
 	echo "<div class=\"wrap\">
 				<div class=\"list\">
-					<h3>Virtual Machine Information</h3>			
+					<h3>Virtual Machine Information &nbsp;<a href=\"?vmpage=main\" autofocus title=\"refresh state\"><i class=\"glyphicon glyphicon-refresh blue\"></i></a></h3>			
 						<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$ret</div><div style=\"width: 32%; float:right\"><b>statistics</b> - {$tmp['total']} <b>domains</b>, {$active} <b>active</b>, {$tmp['inactive']} inactive</div>
 					<table class=\"table table-striped\">
   	      			<tr>
