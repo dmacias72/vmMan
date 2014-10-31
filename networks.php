@@ -1,7 +1,7 @@
 	<div class="wrap">
 		<div class="list">
 			<?php
-				$ret = false;
+				$msg = false;
 				if ($subaction) {
    	  	    	$name = $_GET['name'];
 					if ($subaction == 'start'){
@@ -26,7 +26,7 @@
                      '<input type="submit" value=" Edit domain XML description "></tr></form>';
 						}
 					else
-						$ret = 'XML dump of network <i>'.$name.'</i>:<br /><br />'.htmlentities($lv->get_network_xml($name, false));
+						$msg = 'XML dump of network <i>'.$name.'</i>:<br /><br />'.htmlentities($lv->get_network_xml($name, false));
 					}
 				}
 
