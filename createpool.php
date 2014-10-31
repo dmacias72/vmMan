@@ -1,11 +1,11 @@
 <div class="wrap">
 	<div class="list">
 			<h3>Create a new storage in pool</h3>
-				<form method="POST" action="?vmpage=storage&amp;subaction=pool-create">
+				<form method="POST" action="?vmpage=storage&amp;subaction=pool-start">
 					<table>
 						<tr align="left">
 							<td align="right">Storage name:&nbsp;</td>
-							<td align="left"><input type="text" name="pname" placeholder="Name of storage pool"></td>
+							<td align="left"><input type="text" autofocus name="pname" placeholder="Name of storage pool"></td>
 						</tr>
 						<tr align="left">
 							<td align="right">Location:&nbsp;</td>
