@@ -55,7 +55,7 @@
 		if ($vncport < 0){
         	$vnc = "";
         	$wsport= '-';
-      }
+      } else
          $vnc ="<a href=\"#\" onClick=\"window.open('/plugins/vmMan/vnc.html?autoconnect=true&host=".gethostname()."&port=".$wsport.
          "','_blank','scrollbars=yes,resizable=yes'); return false;\" 
          title=\"open VNC connection\"><i class=\"glyphicon glyphicon-eye-open\"></i></a>";
