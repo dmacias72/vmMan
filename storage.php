@@ -2,7 +2,7 @@
 	<div class="list">
 <script type="text/javascript">
 	function toggle_it(itemID){ 
-      // Toggle visibility between none and '' 
+      // Toggle visibility between none and 'table-row' 
       if ((document.getElementById(itemID).style.display == 'none')) { 
             document.getElementById(itemID).style.display = 'table-row' 
             event.preventDefault()
@@ -15,7 +15,7 @@
 
 	<?php
 		$msg="none";
-		$clrh = false;
+		$clear = false;
 	if ($action) {
 		if ($action == 'volume-create') {
 			include('/usr/local/emhttp/plugins/vmMan/createvol.php');
@@ -28,14 +28,12 @@
 			$msg = $lv->storagevolume_delete( base64_decode($_GET['vpath']) ) ? 
 				'Volume has been successfully deleted' : 
 				'Cannot delete volume '.$lv->get_last_error();
-			$clrh = true;
 		}
 		elseif ($subaction == 'volume-save') {
 			if (array_key_exists('sent', $_POST)) {
 				$msg = $lv->storagevolume_create($_GET['pool'], $_POST['vname'], $_POST['capacity'], $_POST['allocation'], $_POST['disk_driver']) ?
 					'Volume has been successfully created' : 
 					'Cannot create volume '.$lv->get_last_error();
-				$clrh = true;
 			}
 		}
   		elseif ($subaction == 'pool-refresh') {
@@ -44,7 +42,6 @@
 				$msg = $lv->storagepool_refresh($res) ? 
 					"Storage pool $pname has been successfully refreshed" : 
 					"Cannot refresh storage pool $pname ".$lv->get_last_error();
-				$clrh = true;
 		}
   		elseif ($subaction == 'pool-remove') {
 				$pname = $_GET['pool'];
@@ -54,7 +51,6 @@
 				$msg = $lv->storagepool_undefine($res) ? 
 					"Storage pool $pname has been successfully removed" : 
 					"Cannot remove storage pool $pname ".$lv->get_last_error();
-				$clrh = true;
 		}
   		elseif ($subaction == 'pool-stop') {
 				$pname = $_GET['pool'];
@@ -62,7 +58,6 @@
 				$msg = $lv->storagepool_destroy($res) ? 
 					"Storage pool $pname has been successfully stopped" : 
 					"Cannot stop storage pool $pname ".$lv->get_last_error();
-				$clrh = true;
 		}
 		elseif ($subaction == 'pool-start') {
 			if (array_key_exists('sent', $_POST)) {
@@ -92,15 +87,14 @@
 				$msg = $lv->storagepool_create($res) ?
 					"Storage pool $pname has been created successfully" : 
 					"Cannot create storage pool $pname ".$lv->get_last_error();
-				$clrh = true;
 			} else {
 				$pname = $_GET['pool'];
 				$res = $lv->get_storagepool_res($pname);
 				$msg = $lv->storagepool_create($res) ?
 					"Storage pool $pname has been successfully started" : 
 					"Cannot start storage pool $pname ".$lv->get_last_error();
-				$clrh = true;
 			}
+		$clear = true;
 		}
 				echo "<h3>Storage Pool Information<a href=\"?vmpage=storage&amp;action=pool-create\" title=\"create new storage pool\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h3>
 					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
@@ -183,7 +177,7 @@
 				}
 			}
 				echo "</table>";
-		if ($clrh) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs?vmpage=storage'); </script>";
+		if ($clear) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs?vmpage=storage'); </script>";
 		}
 		?>
 	</div>
