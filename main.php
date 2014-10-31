@@ -168,7 +168,7 @@
 			echo " | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid&amp;view=readonly'\" 
 		  		title=\"view domain XML\"><i class=\"glyphicon glyphicon-arrow-down\"></i></button>";
 		else
-      	echo " | <a class=\"btn btn-sm btn-danger\" href=\"?vmpage=main&amp;action=domain-undefine&uuid=$uuid\" 
+      	echo " | <a class=\"btn btn-sm btn-danger\" href=\"?vmpage=main&amp;action=domain-undefine&amp;uuid=$uuid\" 
           		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a>
           		  | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid&amp;view='\" 
 		  		title=\"edit domain XML\"><i class=\"glyphicon glyphicon-plus\"></i></button>";
@@ -176,7 +176,9 @@
 	}
 	echo "</td></tr></table></div>";
 	if ($clear) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs'); </script>";
-	if ($refresh) echo '<meta http-equiv="refresh" content="5; url=?vmpage=main">';
+	if ($refresh) echo '<meta http-equiv="refresh" content="5; url=?vmpage=main&amp;refresh2=true">';
+	if ($_GET['refresh2']) echo '<meta http-equiv="refresh" content="7; url=?vmpage=main&amp;refresh=true">';
+	if ($_GET['refresh']) echo '<meta http-equiv="refresh" content="7; url=?vmpage=main">';
 ?>
 	</div>
 </div>
