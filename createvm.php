@@ -186,7 +186,7 @@
       	<input class="checkbox" type="checkbox" value="1" name="feature_acpi" title="ACPI is for power management, required for graceful shutdown" checked="checked" /> ACPI<br />
       	<input class="checkbox" type="checkbox" value="1" name="feature_pae" title="Physical address extension mode allows 32-bit guests to address more than 4 GB of memory" checked="checked" /> PAE<br />
       	<input class="checkbox" type="checkbox" value="1" name="feature_hap" title="Enable use of Hardware Assisted Paging if available in the hardware" /> HAP<br />
-			<input class="checkbox" type="checkbox" value="1" name="usbtab" title="mouse coordinates in vm match the pointer position on the real desktop" /> VNC Mouse (enable for OS with desktop ie Windows)
+			<input class="checkbox" type="checkbox" value="1" name="usbtab" title="mouse coordinates in vm match the pointer position on the real desktop" checked="checked"/> VNC Mouse (uncheck for OS without desktop)
     </td>
 </tr>
 
