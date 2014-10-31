@@ -40,6 +40,17 @@
 ?>
 <script>
 <!--
+	function toggle_it(itemID){ 
+      // Toggle visibility between none and '' 
+      if ((document.getElementById(itemID).style.display == 'none')) { 
+            document.getElementById(itemID).style.display = 'table-row' 
+            event.preventDefault()
+      } else { 
+            document.getElementById(itemID).style.display = 'none'; 
+            event.preventDefault()
+      }    
+	}
+	
 	function change_divs(what, val) {
 		if (val == 1)
 			style = 'table-row';
@@ -88,24 +99,20 @@
 <table id="form-table">
 <tr>
     <td align="right">Name:&nbsp; </td>
-    <td><input type="text" name="name" title="name of vitual machine" placeholder="name of vitual machine" /></td>
+    <td><input type="text" autofocus name="name" title="name of vitual machine" placeholder="name of vitual machine" /></td>
 </tr>
 
 <tr>
     <td align="right">Install image (iso):&nbsp; </td>
     <td>
 		<select name="media" title="cdrom or media image used for installing operating system">
+			<option value="" selected>none selected</option>
 <?php
-	if(!$pools) 
-		echo "<option value=\"\">No Storage Pools</option>";
-	else {
-		echo '<option value="" selected>none selected</option>';
+	if($pools) {
 		for ($i = 0; $i < sizeof($pools); $i++) {
 			$pname = $pools[$i];
 			$info = $lv->get_storagepool_info($pname);
-			if (!$info['volume_count'] > 0) 
-				echo "<option value=\"false\">No Storage Volumes</option>";
-			else {
+			if ($info['volume_count'] > 0) {
 				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
 				$tmp_keys = array_keys($tmp);
 				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
@@ -127,17 +134,13 @@
     <td align="right">drivers image (iso):&nbsp; </td>
     <td>
 		<select name="drivers" title="cdrom or media image used for installing operating system drivers">
+			<option value="" selected>none selected</option>
 <?php
-	if(!$pools) 
-		echo "<option value=\"\">No Storage Pools</option>";
-	else {
-		echo '<option value="" selected>none selected</option>';
+	if($pools) {
 		for ($i = 0; $i < sizeof($pools); $i++) {
 			$pname = $pools[$i];
 			$info = $lv->get_storagepool_info($pname);
-			if (!$info['volume_count'] > 0) 
-				echo "<option value=\"false\">No Storage Volumes</option>";
-			else {
+			if ($info['volume_count'] > 0) {
 				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
 				$tmp_keys = array_keys($tmp);
 				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
@@ -179,10 +182,11 @@
 <tr>
     <td align="right">Features:&nbsp;</td>
     <td>
-        <input class="checkbox" type="checkbox" value="1" name="feature_apic" title="APIC allows the use of programmable IRQ management" checked="checked" /> APIC<br />
-        <input class="checkbox" type="checkbox" value="1" name="feature_acpi" title="ACPI is for power management, required for graceful shutdown" checked="checked" /> ACPI<br />
-        <input class="checkbox" type="checkbox" value="1" name="feature_pae" title="Physical address extension mode allows 32-bit guests to address more than 4 GB of memory" checked="checked" /> PAE<br />
-        <input class="checkbox" type="checkbox" value="1" name="feature_hap" title="Enable use of Hardware Assisted Paging if available in the hardware" /> HAP
+      	<input class="checkbox" type="checkbox" value="1" name="feature_apic" title="APIC allows the use of programmable IRQ management" checked="checked" /> APIC<br />
+      	<input class="checkbox" type="checkbox" value="1" name="feature_acpi" title="ACPI is for power management, required for graceful shutdown" checked="checked" /> ACPI<br />
+      	<input class="checkbox" type="checkbox" value="1" name="feature_pae" title="Physical address extension mode allows 32-bit guests to address more than 4 GB of memory" checked="checked" /> PAE<br />
+      	<input class="checkbox" type="checkbox" value="1" name="feature_hap" title="Enable use of Hardware Assisted Paging if available in the hardware" /> HAP<br />
+			<input class="checkbox" type="checkbox" value="1" name="usbtab" title="mouse coordinates in vm match the pointer position on the real desktop" /> VNC Mouse (enable for OS with desktop ie Windows)
     </td>
 </tr>
 
@@ -205,48 +209,71 @@
         </select>
     </td>
 </tr>
-<tr align="right"><td><b>Network settings:</b></td></tr>
 <tr>
-   <td align="right">MAC:&nbsp;</td>
-   <td>
-		<input type="text" name="nic[mac]" title="random mac, you can supply your own" value="<?php echo $lv->generate_random_mac_addr() ?>" id="nic_mac_addr" />
-	</td>
-</tr>
-<tr>
-   <td align="right">NIC:&nbsp;</td>
-   <td>
-   	<select name="nic[type]" title="virtio unless passing through nic">
-<?php
-	$models = $lv->get_nic_models();
-        for ($i = 0; $i < sizeof($models); $i++)
-                echo '<option value="'.$models[$i].'">'.$models[$i].'</option>';
-?>
+    <td align="right"><b>Network Settings:&nbsp;</b></td>
+    <td>
+      <select onchange="change_divs('network', this.value)">
+	<option value="0">Auto</option>
+	<option value="1">Yes</option>
       </select>
-   </td>
-</tr>
-<tr>
-   <td align="right" >Bridge:&nbsp;</td>
-   <td>
-		<input type="text" value="<?=$network_cfg['BRNAME'];?>" name="nic[net]" placeholder="name of bridge in unRAID" title="name of bridge in unRAID automatically filled in" />			
-   </td>
+    </td>
+</tr>	
+<tr id="setup_network" style="display: none">
+    <td>&nbsp;</td>
+    <td>
+        <table>
+			<tr>
+		   	<td align="right">MAC:&nbsp;</td>
+   			<td>
+					<input type="text" name="nic[mac]" title="random mac, you can supply your own" value="<?php echo $lv->generate_random_mac_addr() ?>" id="nic_mac_addr" />
+				</td>
+			</tr>
+			<tr>
+   			<td align="right">NIC:&nbsp;</td>
+   			<td>
+				<select name="nic[type]" title="virtio unless passing through nic">
+					<?php
+					$models = $lv->get_nic_models();
+      	  		for ($i = 0; $i < sizeof($models); $i++)
+         	       echo '<option value="'.$models[$i].'">'.$models[$i].'</option>';
+					?>
+      		</select>
+   			</td>
+			</tr>
+			<tr>
+   			<td align="right" >Bridge:&nbsp;</td>
+			   <td>
+					<input type="text" value="<?=$network_cfg['BRNAME'];?>" name="nic[net]" placeholder="name of bridge in unRAID" title="name of bridge in unRAID automatically filled in" />			
+			   </td>
+			</tr>
+        </table>
+    </td>
 </tr>
 
-<tr align="right"><td><b>Disk settings:</b></td></tr>
+<tr>
+    <td align="right"><b>Disk Settings:&nbsp;</b></td>
+    <td>
+      <select onchange="change_divs('disk', this.value)">
+	<option value="1">Yes</option>
+	<option value="0">No</option>
+      </select>
+    </td>
+</tr>
+<tr id="setup_disk" style="display: table-row">
+    <td>&nbsp;</td>
+    <td>
+        <table>
 <tr>
 	<td align="right">Disk image:&nbsp;</td>
 	<td>
 		<select name="disk[image]" title="select domain image to use for virtual machine">
+			<option value="" selected>none selected</option>
 <?php
-	if(!$pools) 
-		echo '<option value="">No Storage Pools</option>';
-	else {
-		echo '<option value="" selected>none selected</option>';
+	if($pools) {
 		for ($i = 0; $i < sizeof($pools); $i++) {
 			$pname = $pools[$i];
 			$info = $lv->get_storagepool_info($pname);
-			if (!$info['volume_count'] > 0) 
-				echo '<option value="false">No Storage Volumes</option>';
-			else {
+			if ($info['volume_count'] > 0) {
 				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
 				$tmp_keys = array_keys($tmp);
 				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
@@ -264,8 +291,8 @@
 	</td>
 </tr>
 <tr>
-	<td align="right">Disk bus:&nbsp;</td>
-	<td>
+	<td align="right" style="display: none">Disk bus:&nbsp;</td>
+	<td style="display: none">
 		<select name="disk[bus]" title="virtio unless passing through controller" >
 			<option value="virtio">virtio</option>
 			<option value="scsi">SCSI</option>
@@ -289,11 +316,27 @@
 		<input type="text" value="hda" name="disk[dev]" placeholder="name of disk inside vm" title="name of disk inside vm" />
 	</td>
 </tr>
+	</table>
+    </td>
+</tr>
 
-<tr><td align="right"><b>USB devices:&nbsp;</b></td>
+<tr>
+    <td align="right"><b>USB Devices:&nbsp;</b></td>
+    <td>
+      <select onchange="change_divs('usb', this.value)">
+	<option value="0">No</option>
+	<option value="1">Yes</option>
+      </select>
+    </td>
+</tr>
+<tr id="setup_usb" style="display: none">
+    <td>&nbsp;</td>
+    <td>
+        <table>
+
+<tr>
 	<td align="left">
 <?php
-	echo '<input class="checkbox" type="checkbox" name="usbtab" value="1" title="mouse coordinates in vm match the pointer position on the real desktop" />USB tablet (Enable For OS with GUI)<br />';
 	$tmp = $lv->get_node_devices('usb_device');
 	for ($i = 0; $i < sizeof($tmp); $i++) {
 		$tmp2 = $lv->get_node_device_information($tmp[$i]);
@@ -303,9 +346,24 @@
 ?>
   	</td>
 </tr>
+	</table>
+    </td>
+</tr>
 
-<tr align="right"><td><b>9p Share Settings:&nbsp;</b></td><td align="left"><b>for linux VM's</b?</td></tr>
-
+<tr>
+    <td align="right"><b>9p Share Settings:&nbsp;</b></td>
+    <td>
+      <select onchange="change_divs('shares', this.value)">
+	<option value="0">No</option>
+	<option value="1">Yes</option>
+      </select>
+    </td>
+</tr>
+	
+<tr id="setup_shares" style="display: none">
+    <td>&nbsp;</td>
+    <td>
+        <table>
 <tr>
 	<td align="right">unRAID share:&nbsp;</td>
 	<td>
@@ -318,6 +376,9 @@
 	<td>
 		<input type="text" value="" name="shares[target]" placeholder="e.g. shares (name of mount tag inside vm)" title="mount tag inside vm" />
 	</td>
+</tr>
+        </table>
+    </td>
 </tr>
 
 </div>
