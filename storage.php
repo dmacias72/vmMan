@@ -1,53 +1,70 @@
 <div class="wrap">
 	<div class="list">
-<?php
-	if ($action == 'volume-create') {
-		include('/usr/local/emhttp/plugins/vmMan/createvol.php');
-	}
-	elseif ($action == 'pool-create') {
-		include('/usr/local/emhttp/plugins/vmMan/createpool.php');
+<script type="text/javascript">
+	function toggle_it(itemID){ 
+      // Toggle visibility between none and '' 
+      if ((document.getElementById(itemID).style.display == 'none')) { 
+            document.getElementById(itemID).style.display = 'table-row' 
+            event.preventDefault()
+      } else { 
+            document.getElementById(itemID).style.display = 'none'; 
+            event.preventDefault()
+      }    
 	} 
-	else {		
-  		if ($subaction == 'volume-delete') {
-				$lv->storagevolume_delete( base64_decode($_GET['vpath']) ) ? 
-				$msg = 'Volume has been successfully deleted' : 
-				$msg = 'Cannot delete volume '.$lv->get_last_error();
-				$clhr = true;
+</script>
+
+	<?php
+		$msg="none";
+		$clrh = false;
+	if ($action) {
+		if ($action == 'volume-create') {
+			include('/usr/local/emhttp/plugins/vmMan/createvol.php');
+		}
+		elseif ($action == 'pool-create') {
+			include('/usr/local/emhttp/plugins/vmMan/createpool.php');
+		}
+	}else{
+		if ($subaction == 'volume-delete') {
+			$msg = $lv->storagevolume_delete( base64_decode($_GET['vpath']) ) ? 
+				'Volume has been successfully deleted' : 
+				'Cannot delete volume '.$lv->get_last_error();
+			$clrh = true;
 		}
 		elseif ($subaction == 'volume-save') {
 			if (array_key_exists('sent', $_POST)) {
-				$lv->storagevolume_create($_GET['pool'], $_POST['vname'], $_POST['capacity'], $_POST['allocation'], $_POST['disk_driver']) ?
-					$msg = 'Volume has been successfully created' : 
-					$msg = 'Cannot create volume '.$lv->get_last_error();
-					$clrh = true;
+				$msg = $lv->storagevolume_create($_GET['pool'], $_POST['vname'], $_POST['capacity'], $_POST['allocation'], $_POST['disk_driver']) ?
+					'Volume has been successfully created' : 
+					'Cannot create volume '.$lv->get_last_error();
+				$clrh = true;
 			}
 		}
   		elseif ($subaction == 'pool-refresh') {
 				$pname = $_GET['pool'];
 				$res = $lv->get_storagepool_res($pname);				
-				$lv->storagepool_refresh($res) ? 
-				$msg = "Storage pool $pname has been successfully refreshed" : 
-				$msg = "Cannot refresh storage pool $pname ".$lv->get_last_error();
-				$clhr = true;
+				$msg = $lv->storagepool_refresh($res) ? 
+					"Storage pool $pname has been successfully refreshed" : 
+					"Cannot refresh storage pool $pname ".$lv->get_last_error();
+				$clrh = true;
 		}
   		elseif ($subaction == 'pool-remove') {
 				$pname = $_GET['pool'];
 				$res = $lv->get_storagepool_res($pname);				
-				$lv->storagepool_destroy($res) ? 
-				$msg = "Storage pool $pname has been successfully removed" : 
-				$msg = "Cannot remove storage pool $pname ".$lv->get_last_error();
-				$lv->storagepool_undefine($res);		
-				$clhr = true;
+				if ($lv->storagepool_is_active($res)) 
+					$lv->storagepool_destroy($res);
+				$msg = $lv->storagepool_undefine($res) ? 
+					"Storage pool $pname has been successfully removed" : 
+					"Cannot remove storage pool $pname ".$lv->get_last_error();
+				$clrh = true;
 		}
   		elseif ($subaction == 'pool-stop') {
 				$pname = $_GET['pool'];
 				$res = $lv->get_storagepool_res($pname);				
-				$lv->storagepool_destroy($res) ? 
-				$msg = "Storage pool $pname has been successfully stopped" : 
-				$msg = "Cannot stop storage pool $pname ".$lv->get_last_error();
-				$clhr = true;
+				$msg = $lv->storagepool_destroy($res) ? 
+					"Storage pool $pname has been successfully stopped" : 
+					"Cannot stop storage pool $pname ".$lv->get_last_error();
+				$clrh = true;
 		}
-		elseif ($subaction == 'pool-create') {
+		elseif ($subaction == 'pool-start') {
 			if (array_key_exists('sent', $_POST)) {
 				$pname = $_POST['pname'];
 				$ppath = $_POST['ppath'];
@@ -72,26 +89,24 @@
 						</target>
 					</pool>";						
 				$res = $lv->storagepool_define_xml($xml);
-				$lv->storagepool_create($res) ?
-					$msg = "Storage pool $pname has been created successfully" : 
-					$msg = "Cannot create storage pool $pname ".$lv->get_last_error();
+				$msg = $lv->storagepool_create($res) ?
+					"Storage pool $pname has been created successfully" : 
+					"Cannot create storage pool $pname ".$lv->get_last_error();
 				$clrh = true;
 			} else {
 				$pname = $_GET['pool'];
 				$res = $lv->get_storagepool_res($pname);
-				$lv->storagepool_create($res) ?
-					$msg = "Storage pool $pname has been successfully started" : 
-					$msg = "Cannot start storage pool $pname ".$lv->get_last_error();
+				$msg = $lv->storagepool_create($res) ?
+					"Storage pool $pname has been successfully started" : 
+					"Cannot start storage pool $pname ".$lv->get_last_error();
 				$clrh = true;
 			}
 		}
-			if (!$msg)
-				$msg="none";
 				echo "<h3>Storage Pool Information<a href=\"?vmpage=storage&amp;action=pool-create\" title=\"create new storage pool\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h3>
 					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
 				<table class=\"table table-striped\">
 					<tr>
-						<th>Name<th>
+						<th><a href=\"?vmpage=storage\">Name</a><th>
 						<th>Activity</th>
 						<th>Volume count</th>
 						<th>State</th>
@@ -110,7 +125,7 @@
 					$info = $lv->get_storagepool_info($pname);
 					$act = $info['active'] ? 'Active' : 'Inactive';	
 					echo "<tr>
-							<td>$pname<td>
+							<td><a href=\"#\" onclick=\"toggle_it('pool$i')\">$pname</a><td>
 							<td>$act</td>
 							<td>{$info['volume_count']}</td>
 							<td>{$lv->translate_storagepool_state($info['state'])}</td>
@@ -121,21 +136,22 @@
 							<td>";
 						if ($act == "Active") {
 							echo "<a href=\"?vmpage=storage&amp;pool=$pname&amp;subaction=pool-stop\" title=\"stop storage pool\"
-									onclick=\"return confirm('All volumes will remain. Stop $pname storage pool?')\"><i class=\"glyphicon glyphicon-stop red\"></i></a> | ";
-						echo "<a href=\"?vmpage=storage&amp;pool=$pname&amp;subaction=pool-refresh\" title=\"refresh storage pool\"
-									><i class=\"glyphicon glyphicon-refresh blue\"></i></a> | ";
+									onclick=\"return confirm('All volumes will remain. Stop $pname storage pool?')\"><i class=\"glyphicon glyphicon-stop red\"></i></a> | ".
+									"<a href=\"?vmpage=storage&amp;pool=$pname&amp;subaction=pool-refresh\" title=\"refresh storage pool\">
+									<i class=\"glyphicon glyphicon-refresh blue\"></i></a> | ".
+									"<a href=\"?vmpage=storage&amp;pool=$pname&amp;action=volume-create\" title=\"add new storage volume\">
+									<i class=\"glyphicon glyphicon-plus green\"></i></a> | ";
 						}else{						
-							echo "<a href=\"?vmpage=storage&amp;pool=$pname&amp;subaction=pool-create\" title=\"start storage pool\"
+							echo "<a href=\"?vmpage=storage&amp;pool=$pname&amp;subaction=pool-start\" title=\"start storage pool\"
 									><i class=\"glyphicon glyphicon-play green\"></i></a> | ";
 						}
-						echo "<a href=\"?vmpage=storage&amp;pool=$pname&amp;action=volume-create\" title=\"add new storage volume\"><i class=\"glyphicon glyphicon-plus green\"></i></a> | ".
-								"<a href=\"?vmpage=storage&amp;pool=$pname&amp;subaction=pool-remove\" title=\"remove storage pool but not storage volumes\"
+						echo "<a href=\"?vmpage=storage&amp;pool=$pname&amp;subaction=pool-remove\" title=\"remove storage pool but not storage volumes\"
 									onclick=\"return confirm('All volumes will remain. Remove $pname storage pool?')\"><i class=\"glyphicon glyphicon-remove red\"></i></a>
 							</td>
   	       	      </tr>";
 	
 					if ($info['volume_count'] > 0) {
-						echo "<tr>
+						echo "<tr id=\"pool$i\" style=\"display: none\">
 								<td colspan=\"10\" style='padding-left: 40px'><table>
 								<tr>
 								  <th>Name</th>
@@ -167,9 +183,8 @@
 				}
 			}
 				echo "</table>";
-			if ($clrh) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs?vmpage=storage'); </script>";
+		if ($clrh) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs?vmpage=storage'); </script>";
 		}
-	//	echo '<textarea rows="16" cols="90%">'.$xml.'</textarea>';
 		?>
 	</div>
 </div>
