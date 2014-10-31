@@ -133,8 +133,8 @@
 					<timer name='hpet' present='yes'/>
 				</clock>
 				<on_poweroff>destroy</on_poweroff>
-				<on_reboot>destroy</on_reboot>
-				<on_crash>destroy</on_crash>
+				<on_reboot>restart</on_reboot>
+				<on_crash>restart</on_crash>
 				<vcpu>$vcpus</vcpu>
 				<devices>
 					<emulator>$emulator</emulator>
@@ -178,8 +178,8 @@
 						<timer name='hpet' present='yes'/>
 					</clock>
 					<on_poweroff>destroy</on_poweroff>
-					<on_reboot>destroy</on_reboot>
-					<on_crash>destroy</on_crash>
+					<on_reboot>restart</on_reboot>
+					<on_crash>restart</on_crash>
 					<vcpu>$vcpus</vcpu>
 					<devices>
 						<emulator>$emulator</emulator>
