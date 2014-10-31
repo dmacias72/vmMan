@@ -1,12 +1,10 @@
 	<div class="wrap">
    	<div class="list">
 			<?php
-				$ret = false;
-				if (array_key_exists('subaction', $_GET)) {
-					$name = $_GET['name'];
-				}
+				$msg = "none";
 				$cap = $_GET['cap'];
-				echo "<h3>Device Node Information</h3>   	
+				echo "<h3>Device Node Information</h3>
+						<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
 						<p><div class=\"btn-group btn-group-sm\">";
 				if ($cap == "")
 					echo "<a class=\"btn btn-primary\" href=\"?vmpage=nodes&amp;cap={$tmp[0]}\">all</a>";
