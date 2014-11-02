@@ -150,6 +150,8 @@
 		        	      <tr>
       	      	   	<th>Number</th>
          	       		<th> Name</th>
+         	       		 <th> Date </th>
+         	       		 <th> Time </th>
                   		<th> Actions </th>
                   		<th> &nbsp; </th>
 	                  </tr>";
@@ -158,9 +160,13 @@
          	sort($tmp);
 				for ($i = 0; $i < sizeof($tmp); $i++) {
 					$sname = $tmp[$i];
+					 $datestamp = date("D d M  Y",$sname);
+					 $timestamp = date("H:i:s",$sname);
             	echo "<tr>
             		   	<td>".($i+1)."</td>
                   	   <td align=\"left\">$sname</td>
+                  	   <td align=\"left\">$datestamp</td>
+                  	    <td align=\"left\">$timestamp</td>
    	                  <td align=\"left\">
 									revert &nbsp;<a href=\"?vmpage=dominfo&amp;uuid=$uuid&amp;action=snap-revert&amp;sname=$sname\"><i class=\"glyphicon glyphicon-refresh lightblue\"></i></a>
             	          </td>                               
