@@ -35,9 +35,14 @@
         		"Domain $domName has been successfully restarted" : 
         		'Error while restarting domain: '.$lv->get_last_error();
 		}
+      elseif ($action == 'domain-save') {
+        	$msg = $lv->domain_save($domName) ? 
+        		"Domain $domName has been successfully saved" : 
+        		'Error while saving domain: '.$lv->get_last_error();
+		}
 		elseif ($action == 'domain-stop') {
          $msg = $lv->domain_shutdown($domName) ? 
-         	"Domain $domName has been successfully stopped" : 
+         	"Domain $domName has been sent stop command" : 
          	'Error while stopping domain: '.$lv->get_last_error();
         	$refresh = true; }
       elseif ($action == 'domain-destroy') {
@@ -152,6 +157,8 @@
         				title=\"Pause domain\"><i class=\"glyphicon glyphicon-pause\"></i></button> | 
             	<button class=\"btn btn-sm btn-primary\" onClick=\"javascript:location.href='?action=domain-restart&amp;uuid=$uuid'\" 
         				title=\"restart domain\"><i class=\"glyphicon glyphicon-refresh\"></i></button> | 
+        			<button class=\"btn btn-sm btn-warning\" onClick=\"javascript:location.href='?vmpage=&amp;action=domain-save&amp;uuid=$uuid'\" 
+        				title=\"Suspend to disk, save domain state\"><i class=\"glyphicon glyphicon-save\"></i></button> | 
         			<button class=\"btn btn-sm btn-danger\" onClick=\"javascript:location.href='?vmpage=&amp;action=domain-stop&amp;uuid=$uuid'\" 
         				title=\"safely shutdown domain\"><i class=\"glyphicon glyphicon-stop\"></i></button> | 
               	<a class=\"btn btn-sm btn-default\" href=\"?action=domain-destroy&amp;uuid=$uuid\" 
@@ -166,7 +173,7 @@
 		}
       if ($lv->domain_is_running($res, $name))
 			echo " | <button class=\"btn btn-sm btn-info\" onClick=\"javascript:location.href='?vmpage=editxml&amp;uuid=$uuid&amp;view=readonly'\" 
-		  		title=\"view domain XML\"><i class=\"glyphicon glyphicon-arrow-down\"></i></button>";
+		  		title=\"view domain XML\"><i class=\"glyphicon glyphicon-open\"></i></button>";
 		else
       	echo " | <a class=\"btn btn-sm btn-danger\" href=\"?vmpage=main&amp;action=domain-undefine&amp;uuid=$uuid\" 
           		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove\"></i></a>
