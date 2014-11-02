@@ -166,8 +166,8 @@
 										<td>{$lv->format_size($tmp[$vname]['capacity'], 2)}</td>
 										<td>{$lv->format_size($tmp[$vname]['allocation'], 2)}</td>
 										<td>$vpath</td>
-										<td><a href=\"?vmpage=storage&amp;vpath=".base64_encode($vpath)."&amp;subaction=volume-delete\" 
-												onclick=\"return confirm('You want to permanently delete $vname?')\" title=\"remove storage volume\"><i class=\"glyphicon glyphicon-remove red\"></i></a></td>
+										<td>delete <a href=\"?vmpage=storage&amp;vpath=".base64_encode($vpath)."&amp;subaction=volume-delete\" 
+												onclick=\"return confirm('You want to permanently delete $vname?')\" title=\"delete storage volume\"><i class=\"glyphicon glyphicon-remove red\"></i></a></td>
 							      </tr>";
 						}	
 
