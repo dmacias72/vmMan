@@ -61,7 +61,7 @@
             }
        }
          //edit domain XML
-         elseif ($action == 'domain-save') {
+         elseif ($action == 'domain-create') {
          	$inactive = (!$lv->domain_is_running($res, $name)) ? true : false;
             $xml = $lv->domain_get_xml($domName, $inactive);
            	if (@$_POST['xmldesc']) {
