@@ -862,9 +862,11 @@
 
 			$capacity = $this->parse_size($capacity);
 			$allocation = $this->parse_size($allocation);
-
+			($format != 'raw' ) ? $ext = $format : $ext = 'img';
+			($ext == pathinfo($name, PATHINFO_EXTENSION)) ? $ext = '': $name .= '.';
+				
 			$xml = "<volume>\n".
-                               "   <name>$name</name>\n".
+                               "   <name>$name$ext</name>\n".
                                "   <capacity>$capacity</capacity>\n".
                                "   <allocation>$allocation</allocation>\n".
                                "   <target>\n".
@@ -1322,6 +1324,14 @@
 			return ($tmp) ? $tmp : $this->_set_last_error();
 		}
 
+		function domain_save($domain) {
+			$dom = $this->get_domain_object($domain);
+			if (!$dom)
+				return false;
+
+			$tmp = libvirt_domain_managedsave($dom);
+			return ($tmp) ? $tmp : $this->_set_last_error();
+		}
 		function domain_resume($domain) {
 			$dom = $this->get_domain_object($domain);
 			if (!$dom)
@@ -1666,6 +1676,26 @@
 
 		function domain_set_autostart($res,$flags) {
 			return libvirt_domain_set_autostart($res,$flags);
+		}
+
+		function domain_snapshots_list($res) {
+			return libvirt_list_domain_snapshots($res);
+		}
+
+		function domain_snapshot_create($res) {
+			return libvirt_domain_snapshot_create($res);
+		}
+
+		function domain_snapshot_delete($res) {
+				$tmp = libvirt_domain_snapshot_delete($res);
+			return ($tmp) ? $tmp : $this->_set_last_error();
+		}
+
+		function domain_snapshot_lookup_by_name($res, $name) {
+			return libvirt_domain_snapshot_lookup_by_name($res, $name);
+		}
+		function domain_snapshot_revert($res) {
+			return libvirt_domain_snapshot_revert($res);		
 		}
 	}
 ?>
