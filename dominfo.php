@@ -34,6 +34,23 @@
 						'Network card has been successfully added to the guest' :
 						'Cannot add NIC to the guest: '.$lv->get_last_error();
 			}
+			if ($action == 'snap-create') {
+				$msg = $lv->domain_snapshot_create($res) ? 
+					'snapshot has been successfully created' : 
+					'Cannot create snapshot: '.$lv->get_last_error();
+			}
+			if ($action == 'snap-delete') {
+				$sres = $lv->domain_snapshot_lookup_by_name($res, $_GET['sname']);         
+				$msg = $lv->domain_snapshot_delete($sres) ? 
+					'snapshot has been successfully deleted' : 
+					'Cannot delete snapshot: '.$lv->get_last_error();
+			}
+			if ($action == 'snap-revert') {
+				$sres = $lv->domain_snapshot_lookup_by_name($res, $_GET['sname']);         
+				$msg = $lv->domain_snapshot_revert($sres) ? 
+					'domain has been successfully reverted' : 
+					'Cannot revert domain: '.$lv->get_last_error();
+			}
 		$clear = true;
 		}
 		$emulator = $lv->get_domain_emulator($domName);        
@@ -116,7 +133,7 @@
                         <td align=\"left\">$allocation</td>
                         <td align=\"left\">$physical</td>
                         <td align=\"left\">
-                  	      <a href=\"?vmpage=dominfo&amp;uuid={$_GET['uuid']}&amp;action=disk-remove&amp;dev={$tmp[$i]['device']}\"
+                  	      remove <a href=\"?vmpage=dominfo&amp;uuid={$_GET['uuid']}&amp;action=disk-remove&amp;dev={$tmp[$i]['device']}\"
                   	      onclick=\"return confirm('Disk is not deleted. Remove from domain?')\" title=\"remove disk from domain\">
                   	      <i class=\"glyphicon glyphicon-remove red\"></i></a>
                         </td>
@@ -126,6 +143,37 @@
  			else
          	echo "<tr><td>Domain doesn't have any disk devices</td></tr>";
            echo "</table>";
+
+			/* Snapshots  information */
+         echo "<h4><b>Snapshots </b><a href=\"?vmpage=dominfo&amp;uuid=$uuid&amp;action=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
+         	echo "<table class='table table-striped'>
+		        	      <tr>
+      	      	   	<th>Number</th>
+         	       		<th> Name</th>
+                  		<th> Actions </th>
+                  		<th> &nbsp; </th>
+	                  </tr>";
+         $tmp = $lv->domain_snapshots_list($res); 
+         if (!empty($tmp)) {
+         	sort($tmp);
+				for ($i = 0; $i < sizeof($tmp); $i++) {
+					$sname = $tmp[$i];
+            	echo "<tr>
+            		   	<td>".($i+1)."</td>
+                  	   <td align=\"left\">$sname</td>
+   	                  <td align=\"left\">
+									revert &nbsp;<a href=\"?vmpage=dominfo&amp;uuid=$uuid&amp;action=snap-revert&amp;sname=$sname\"><i class=\"glyphicon glyphicon-refresh lightblue\"></i></a>
+            	          </td>                               
+   	                  <td align=\"left\">
+									delete&nbsp;<a href=\"?vmpage=dominfo&amp;uuid=$uuid&amp;action=snap-delete&amp;sname=$sname\"><i class=\"glyphicon glyphicon-remove red\"></i></a>
+            	          </td>                               
+               	   </tr>";
+				}
+         }
+         else
+         	echo "<tr><td>no snapshots</td></tr>";
+     	echo "</table>";
+
 			/* Network interface information */
          echo "<h4><b>Network devices</b></h4>";
          	echo "<table class='table table-striped'>
@@ -150,7 +198,7 @@
                   	   <td align=\"left\">{$tmp[$i]['nic_type']}</td>
                      	<td align=\"left\">{$tmp[$i]['network']}</td>
 	                     <td align=\"left\">$netUp</td>
-   	                  <td align=\"left\">"
+   	                  <td align=\"left\">none"
 //      	               	<a href=\"?action=$action&amp;uuid={$_GET['uuid']}&amp;action=nic-remove&amp;mac={$tmp[$i]['mac']}\">
 //         	               Remove network card</a>
             	         ."</td>                               
@@ -161,10 +209,6 @@
          else
          	echo "<tr><td>no network devices</td></tr>";
      	echo "</table>";
- 
-         //if ( $dom['state'] == 1 ) {
-         //    echo "<h3>Screenshots</h3><img src=\"screenshot.php?uuid={$_GET['uuid']}\">";
-         //}
 		if ($clear) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs?vmpage=dominfo&uuid=$uuid'); </script>";
    ?>
   	</div>
