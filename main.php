@@ -125,7 +125,7 @@
       $arch = $lv->domain_get_arch($res);
       $vncport = $lv->domain_get_vnc_port($res);
       $wsport = (int)$vncport -200;
-		$nics = $lv->get_network_cards($res);
+		$nics = $lv->get_nic_info($res)[0]['network'];
       if (($diskcnt = $lv->get_disk_count($res)) > 0) {
         	$disks = $diskcnt.' / '.$lv->get_disk_capacity($res);
          $diskdesc = 'Current physical size: '.$lv->get_disk_capacity($res, true);
