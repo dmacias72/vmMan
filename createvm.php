@@ -28,6 +28,8 @@
   $ci  = $lv->get_connect_information();
   $maxcpu = $ci['hypervisor_maxvcpus'];
   unset($ci);
+  $info = $lv->host_get_node_info();
+  $maxmem = number_format(($info['memory'] / 1048576), 0, '.', ' ');
   if (!$msg)
 	$msg = "none"
 ?>
@@ -106,25 +108,8 @@
     <td align="right">Install image (iso):&nbsp; </td>
     <td>
 		<select name="media" title="cdrom or media image used for installing operating system">
-			<option value="" selected>none selected</option>
 <?php
-	if($pools) {
-		for ($i = 0; $i < sizeof($pools); $i++) {
-			$pname = $pools[$i];
-			$info = $lv->get_storagepool_info($pname);
-			if ($info['volume_count'] > 0) {
-				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
-				$tmp_keys = array_keys($tmp);
-				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
-					$vname = $tmp_keys[$ii];
-					$vpath = $tmp[$vname]['path'];
-					$ext = pathinfo($vpath, PATHINFO_EXTENSION);
-					if ($ext == "iso")
-						echo '<option value="'.base64_encode($vpath).'">'.$vname.'</option>';
-				}
-			}
-		}	
-	}
+	$lv->storagepools_get_iso(true);
 ?>
 		</select>
 	</td>
@@ -134,25 +119,8 @@
     <td align="right">drivers image (iso):&nbsp; </td>
     <td>
 		<select name="drivers" title="cdrom or media image used for installing operating system drivers">
-			<option value="" selected>none selected</option>
 <?php
-	if($pools) {
-		for ($i = 0; $i < sizeof($pools); $i++) {
-			$pname = $pools[$i];
-			$info = $lv->get_storagepool_info($pname);
-			if ($info['volume_count'] > 0) {
-				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
-				$tmp_keys = array_keys($tmp);
-				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
-					$vname = $tmp_keys[$ii];
-					$vpath = $tmp[$vname]['path'];
-					$ext = pathinfo($vpath, PATHINFO_EXTENSION);
-					if ($ext == "iso")
-						echo '<option value="'.base64_encode($vpath).'">'.$vname.'</option>';
-				}
-			}
-		}	
-	}
+	$lv->storagepools_get_iso(true);
 ?>
 		</select>
 	</td>
@@ -177,7 +145,7 @@
             echo '<option value='.$i.'>'.$i.'</option>';
 ?>
 		</select>
-</td>
+	</td>
 
 <tr>
     <td align="right">Features:&nbsp;</td>
@@ -192,12 +160,30 @@
 
 <tr>
     <td align="right">Memory (MiB):&nbsp;</td>
-    <td><input type="text" name="memory" value="512" title="define the amount memory" /></td>
+        <td>
+		<select name="memory" title="define the amount memory">
+	<?php
+        for ($i = 1; $i <= ($maxmem*2); $i++) {
+        		$mem = ($i*512);
+            echo '<option value="'.$mem.'">'.$mem.'</option>';
+			}
+	?>
+		</select>
+	</td>
 </tr>
 
 <tr>
-    <td align="right">Max. Mem (MiB):&nbsp;</td>
-    <td><input type="text" name="maxmem" value="512" title="define the maximun amount of memory" /></td>
+   <td align="right">Max. Mem (MiB):&nbsp;</td>
+	<td>
+		<select name="maxmem" title="define the maximun amount of memory">
+	<?php
+        for ($i = 1; $i <= ($maxmem*2); $i++) {
+        		$mem = ($i*512);
+            echo '<option value="'.$mem.'">'.$mem.'</option>';
+			}
+	?>
+		</select>
+	</td> 
 </tr>
 
 <tr>
@@ -267,25 +253,8 @@
 	<td align="right">Disk image:&nbsp;</td>
 	<td>
 		<select name="disk[image]" title="select domain image to use for virtual machine">
-			<option value="" selected>none selected</option>
 <?php
-	if($pools) {
-		for ($i = 0; $i < sizeof($pools); $i++) {
-			$pname = $pools[$i];
-			$info = $lv->get_storagepool_info($pname);
-			if ($info['volume_count'] > 0) {
-				$tmp = $lv->storagepool_get_volume_information($pools[$i]);
-				$tmp_keys = array_keys($tmp);
-				for ($ii = 0; $ii < sizeof($tmp); $ii++) {
-					$vname = $tmp_keys[$ii];
-					$vpath = $tmp[$vname]['path'];
-					$ext = pathinfo($vpath, PATHINFO_EXTENSION);
-					if ($ext != "iso")
-						echo '<option value="'.base64_encode($vpath).'">'.$vname.'</option>';
-				}
-			}
-		}	
-	}
+	$lv->storagepools_get_iso(false);
 ?>
 		</select>
 	</td>
