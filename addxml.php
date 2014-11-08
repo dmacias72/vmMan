@@ -1,6 +1,6 @@
 <div class="wrap">
 	<div class="list">
-	<h3>Create New Domain XML Description</h3>
+	<h3>Create New Domain XML Description</h3><br />
 		<div>
 			<form method="POST" id="addxml" action="?subaction=domain-define" >
 				<table>

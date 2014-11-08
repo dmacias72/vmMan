@@ -1,27 +1,3 @@
-<script>
-	function toggle_cells(what, val) {
-		if (val == 1){
-			style = 'table-cell';
-			style2 = 'none';
-			tval = 0;}
-		else {
-			style = 'none';
-			style2 = 'table-cell';
-			tval = 1;}
-		name = 'toggle1_'+what;
-		name2 = 'toggle2_'+what;
-		tname = 'toggle_'+what;
-		d = document.getElementById(name);
-		if (d != null)
-			d.style.display = style;
-		d = document.getElementById(name2);
-		if (d != null)
-			d.style.display = style2;
-		d = document.getElementById(tname);
-		if (d != null)
-			d.value = tval;
-	}
-</script>
 <div class="wrap">
   	<div class="list">
    <?php
@@ -228,8 +204,7 @@
      	echo " | <a href=\"?vmpage=&amp;uuid=$uuid&amp;subaction=domain-undefine\" 
         		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove red\"></i></a>";
       
-         
-   echo "</div><table class=\"table table-striped\">
+   echo "</div><br /><br /><table class=\"table table-striped\">
      			<tr>
      				<td>
      					<b>Domain type: </b>$domtype<br />
@@ -277,7 +252,7 @@
          echo "<h4><b>Disk devices</b>";
         // if ($state == 'shutoff')
          //	echo '<a href="'.$pageurl.'&action=disk-add" title="add disk device"><i class="glyphicon glyphicon-plus green"></i></a>';
-         	echo "</h4>
+         	echo "</h4><br />
             	<table class='table table-striped'>
          			<tr>
                   	<th>Disk device</th>
@@ -364,7 +339,7 @@
          echo "</table>";
 
 			/* Snapshots  information */
-         echo "<h4><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
+         echo "<h4><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h4><br />";
          	echo "<table class='table table-striped'>
 		        	      <tr>
       	      	   	<th>Number</th>
@@ -400,7 +375,7 @@
      	echo "</table>";
 
 			/* Network interface information */
-         echo "<h4><b>Network devices</b></h4>";
+         echo "<h4><b>Network devices</b></h4><br />";
          	echo "<table class='table table-striped'>
 		        	      <tr>
       	      	   	<th>MAC Address</th>

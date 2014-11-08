@@ -1,6 +1,6 @@
 <div class="wrap">
 	<div class="list">
-	<h3>View Node XML Description</h3>
+	<h3>View Node XML Description</h3><br />
 		<div>
 			<form method="POST" id="viewXML">
 				<table>

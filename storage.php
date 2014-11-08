@@ -102,7 +102,7 @@
 			$clear = true;
 		}
 				echo "<h3>Storage Pool Information<a href=\"?vmpage=storage&amp;action=pool-create\" title=\"create new storage pool\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h3>
-					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
+					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div><br /><br />
 				<table class=\"table table-striped\">
 					<tr>
 						<th><a href=\"?vmpage=storage\">Name</a><th>
@@ -151,7 +151,7 @@
 	
 					if ($info['volume_count'] > 0) {
 						echo "<tr id=\"pool$i\" style=\"display: none\">
-								<td colspan=\"10\" style='padding-left: 40px'><table>
+								<td colspan=\"10\" style='padding-left: 40px'><br /><br /><table>
 								<tr>
 								  <th>Name</th>
 								  <th>Type</th>

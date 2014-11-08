@@ -17,7 +17,7 @@
     		if (strlen($info) > 2)
       		$info[ strlen($info) - 2 ] = ' ';
 
-			echo "<h3>Host Information</h3>
+			echo "<h3>Host Information</h3><br /><br />
    	      <table class='table table-striped'>
 	      	  	<tr>
 		  	        	<td>Hypervisor: </td>

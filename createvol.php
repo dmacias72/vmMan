@@ -1,6 +1,6 @@
 <div class="wrap">
 	<div class="list">
-			<h3>Create a new volume in <?=$pool?> pool</h3>
+			<h3>Create a new volume in <?=$pool?> pool</h3><br /><br />
 				<form method="POST" action="?vmpage=storage&amp;subaction=volume-save&amp;pool=<?=$pool?>">
 					<table>
 						<tr align="left">

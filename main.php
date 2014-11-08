@@ -88,7 +88,7 @@
 	echo "<div class=\"wrap\">
 				<div class=\"list\">
 					<h3>Virtual Machine Information &nbsp;<a href=\"?vmpage=main\" autofocus title=\"refresh state\"><i class=\"glyphicon glyphicon-refresh blue\"></i></a></h3>			
-						<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div><div style=\"width: 32%; float:right\"><b>statistics</b> - {$tmp['total']} <b>domains</b>, {$active} <b>active</b>, {$tmp['inactive']} inactive</div>
+						<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div><div style=\"width: 32%; float:right\"><b>statistics</b> - {$tmp['total']} <b>domains</b>, {$active} <b>active</b>, {$tmp['inactive']} inactive</div><br /><br />
 					<table class=\"table table-striped\">
   	      			<tr>
   		          		<th>Name</th>

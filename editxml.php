@@ -15,7 +15,7 @@
 		$return = "Cancel";
 	}
 	?>
-	<h3><?=$method;?> Domain <?=$domName;?> XML Description</h3>
+	<h3><?=$method;?> Domain <?=$domName;?> XML Description</h3><br />
 		<div>
 			<form method="POST" id="editXML" action="?vmpage=<?=$vmpage;?>&subaction=domain-create&uuid=<?=$uuid;?>" >
 				<table>

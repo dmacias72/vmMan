@@ -35,7 +35,7 @@
 					$msg="none";
 
 				echo "<h3>Network Information</h3>
-					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
+					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div><br /><br />
 					<table class='table table-striped'>
  	        			<tr>
    	      			<th> Network name </th>

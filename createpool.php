@@ -1,6 +1,6 @@
 <div class="wrap">
 	<div class="list">
-			<h3>Create a new storage in pool</h3>
+			<h3>Create a new storage in pool</h3><br /><br />
 				<form method="POST" action="?vmpage=storage&amp;subaction=pool-start">
 					<table>
 						<tr align="left">

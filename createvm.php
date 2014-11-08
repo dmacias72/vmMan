@@ -36,7 +36,7 @@
 
 	<div class="section"><h3>Create a new Virtual Machine</h3></div>
 	<div id="msg"><b>message:&nbsp;</b><?php echo $msg ?></div>
-
+	<br /><br />
 <?php
     if (!$skip):
 ?>
