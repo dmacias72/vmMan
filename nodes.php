@@ -1,6 +1,12 @@
 	<div class="wrap">
    	<div class="list">
 			<?php
+			if ($action) {
+				if ($action == 'view-xml') {
+					include('/usr/local/emhttp/plugins/vmMan/viewxml.php');
+				}
+			}else{
+
 				$msg = "none";
 				$cap = $_GET['cap'];
 				echo "<h3>Device Node Information</h3>
@@ -35,7 +41,7 @@
 					$tmp2 = $lv->get_node_device_information($tmp[$i]);
 					
 					$act = !array_key_exists('cap', $_GET) ? "<a href=\"?action={$_GET['action']}&amp;subaction=dumpxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-circle-arrow-down\"></i></a>" :
-					   "<a href=\"?vmpage=viewxml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-circle-arrow-down blue\"></i></a>";  
+					   "<a href=\"?vmpage=nodes&amp;action=view-xml&amp;name={$tmp2['name']}\"><i class=\"glyphicon glyphicon-circle-arrow-down blue\"></i></a>";  
 					if ($tmp2['capability'] == 'system') {
 						$driver = '-';
 						$vendor = array_key_exists('hardware_vendor', $tmp2) ? $tmp2['hardware_vendor'] : '';
@@ -70,6 +76,7 @@
 			      		</tr>";
 				}
 				echo "</table>";
+			}
 			?>
 		</div>
 	</div>
