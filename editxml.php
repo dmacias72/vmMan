@@ -17,7 +17,7 @@
 	?>
 	<h3><?=$method;?> Domain <?=$domName;?> XML Description</h3>
 		<div>
-			<form method="POST" id="editXML" action="?vmpage=main&amp;action=domain-create&amp;uuid=<?=$uuid;?>" >
+			<form method="POST" id="editXML" action="?vmpage=<?=$vmpage;?>&subaction=domain-create&uuid=<?=$uuid;?>" >
 				<table>
 					<tr>
 						<td>
