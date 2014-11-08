@@ -5,11 +5,11 @@
 					<table>
 						<tr align="left">
 							<td align="right">Storage name:&nbsp;</td>
-							<td align="left"><input type="text" autofocus name="pname" placeholder="Name of storage pool"></td>
+							<td align="left"><input type="text" autofocus name="pool[name]" placeholder="Name of storage pool"></td>
 						</tr>
 						<tr align="left">
 							<td align="right">Location:&nbsp;</td>
-							<td align="left"><input type="text" name="ppath" placeholder="Will be created if doesn't exist e.g. /mnt/cache/images "></td>
+							<td align="left"><input type="text" name="pool[path]" placeholder="Will be created if doesn't exist e.g. /mnt/cache/images "></td>
 						</tr>
 						<tr align="right">
 							<td align="left"></td>
