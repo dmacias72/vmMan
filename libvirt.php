@@ -80,7 +80,7 @@
 				$mediastr = "<disk type='file' device='cdrom'>
 						<driver name='qemu'/>
 						<source file='".base64_decode($media)."'/>
-						<target dev='sdc' bus='sata'/>
+						<target dev='hdc' bus='ide'/>
 						<readonly/>
 					</disk>";
 			}
@@ -89,7 +89,7 @@
 				$driverstr = "<disk type='file' device='cdrom'>
 						<driver name='qemu' type='raw'/>
 						<source file='".base64_decode($drivers)."'/>
-						<target dev='sdd' bus='sata'/>
+						<target dev='hdd' bus='ide'/>
 						<readonly/>
 					</disk>";
 			}
@@ -207,7 +207,7 @@
 
 		function create_image($image, $size, $driver) {
 			$tmp = libvirt_image_create($this->conn, $image, $size, $driver);
-                        return ($tmp) ? $tmp : $this->_set_last_error();
+         return ($tmp) ? $tmp : $this->_set_last_error();
 		}
 
 		function remove_image($image, $ignore_error_codes=false ) {
@@ -281,13 +281,14 @@
 		}
 
       function domain_disk_add($domain, $img, $dev, $type='scsi', $driver='raw') {
-        $dom = $this->get_domain_object($domain);
-
-        $tmp = libvirt_domain_disk_add($dom, $img, $dev, $type, $driver);
+         $dom = $this->get_domain_object($domain);
+			$img = base64_decode($img);
+         echo "$tmp = libvirt_domain_disk_add($dom, $img, $dev, $type, $driver)";
+         $tmp = libvirt_domain_disk_add($dom, $img, $dev, $type, $driver);
         return ($tmp) ? $tmp : $this->_set_last_error();
       }
 
-		function domain_change_numVCpus($domain, $num) {
+		function domain_change_vcpus($domain, $num) {
 			$dom = $this->get_domain_object($domain);
 
 			$tmp = libvirt_domain_change_vcpus($dom, $num);
@@ -1465,6 +1466,22 @@
 			return $var;
 		}
 
+		function domain_get_vcpu($domain) {
+			$tmp = $this->get_xpath($domain, '//domain/vcpu', false);
+			$var = $tmp[0];
+			unset($tmp);
+
+			return $var;
+		}
+
+		function domain_get_memory($domain) {
+			$tmp = $this->get_xpath($domain, '//domain/memory', false);
+			$var = $tmp[0];
+			unset($tmp);
+
+			return $var;
+		}
+
 		function domain_get_feature($domain, $feature) {
 			$tmp = $this->get_xpath($domain, '//domain/features/'.$feature.'/..', false);
 			$ret = ($tmp != false);
@@ -1643,6 +1660,29 @@
 			return $this->domain_change_xml($domain, $xml);
 		}
 
+		function domain_set_vcpu($domain, $vcpu) {
+			$domain = $this->get_domain_object($domain);
+
+			if (($old_vcpu = $this->domain_get_vcpu($domain)) == $vcpu)
+				return true;
+
+			$xml = $this->domain_get_xml($domain, true);
+			$xml = str_replace("$old_vcpu</vcpu>", "$vcpu</vcpu>", $xml);
+
+			return $this->domain_change_xml($domain, $xml);
+		}
+
+		function domain_set_memory($domain, $memory) {
+			$domain = $this->get_domain_object($domain);
+			if (($old_memory = $this->domain_get_memory($domain)) == $memory)
+				return true;
+
+			$xml = $this->domain_get_xml($domain, true);
+			$xml = str_replace("$old_memory</memory>", "$memory</memory>", $xml);
+
+			return $this->domain_change_xml($domain, $xml);
+		}
+
 		function domain_set_description($domain, $desc) {
 			$domain = $this->get_domain_object($domain);
 
@@ -1694,8 +1734,58 @@
 		function domain_snapshot_lookup_by_name($res, $name) {
 			return libvirt_domain_snapshot_lookup_by_name($res, $name);
 		}
+
 		function domain_snapshot_revert($res) {
 			return libvirt_domain_snapshot_revert($res);		
+		}
+
+		function domain_is_active($res) {
+			return libvirt_domain_is_active($res);
+		}
+
+		//create dropbox options for storage devices
+		function storagepools_get_iso($iso=true) {
+			echo '<option value="" selected>none selected</option>';
+			  $pools = $this->get_storagepools();
+			  if($pools) {
+				for ($i = 0; $i < sizeof($pools); $i++) {
+					$pname = $pools[$i];
+					$info = $this->get_storagepool_info($pname);
+					if ($info['volume_count'] > 0) {
+						$tmp = $this->storagepool_get_volume_information($pools[$i]);
+						$tmp_keys = array_keys($tmp);
+						for ($ii = 0; $ii < sizeof($tmp); $ii++) {
+							$vname = $tmp_keys[$ii];
+							$vpath = $tmp[$vname]['path'];
+							$ext = pathinfo($vpath, PATHINFO_EXTENSION);
+							if ($iso) {
+								if ($ext == "iso")
+									echo '<option value="'.base64_encode($vpath).'">'.$vname.'</option>';
+							}else{
+								if ($ext != "iso")
+									echo '<option value="'.base64_encode($vpath).'">'.$vname.'</option>';
+							}
+						}
+					}
+				}	
+			}
+		}
+		
+		// change cdrom media
+		function domain_change_cdrom($res, $iso, $dev) {
+			$iso = base64_decode($iso);
+   		$tmp = libvirt_domain_update_device($res, "<disk type='file' device='cdrom'><driver name='qemu' type='raw'/><source file=".escapeshellarg($iso)."/><target dev='$dev' bus='ide'/><readonly/></disk>", VIR_DOMAIN_DEVICE_MODIFY_CONFIG);
+			if ($this->domain_is_active($res))   		
+   			libvirt_domain_update_device($res, "<disk type='file' device='cdrom'><driver name='qemu' type='raw'/><source file=".escapeshellarg($iso)."/><target dev='$dev' bus='ide'/><readonly/></disk>", VIR_DOMAIN_DEVICE_MODIFY_LIVE);
+		return ($tmp) ? $tmp : $this->_set_last_error();
+		}
+
+		function domain_change_disk($res, $type, $iso, $dev) {
+			$iso = base64_decode($iso);
+   		$tmp = libvirt_domain_update_device($res, "<disk type='file' device='disk'><driver name='qemu' type='$type'/><source file=".escapeshellarg($iso)."/><target dev='$dev' bus='virtio'/></disk>", VIR_DOMAIN_DEVICE_MODIFY_CONFIG);
+			if ($this->domain_is_active($res))   		
+   			libvirt_domain_update_device($res, "<disk type='file' device='disk'><driver name='qemu' type='$type'/><source file=".escapeshellarg($iso)."/><target dev='$dev' bus='virtio'/></disk>", VIR_DOMAIN_DEVICE_MODIFY_LIVE);
+		return ($tmp) ? $tmp : $this->_set_last_error();
 		}
 	}
 ?>
