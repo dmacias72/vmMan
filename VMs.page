@@ -37,12 +37,12 @@ Type="xmenu"
 	  		      	title="display device node information"><i class="glyphicon glyphicon-stats">
 	  			   </i>&#32;Devices</button>
 		  	   </div>
-		  	   <div class="btn-group">
+<!--		  	   <div class="btn-group">
   	 	  	   	<button class="btn btn-primary"
   		 	  	   	onclick="javascript:location.href='?vmpage=networks'"  
 	 	 	  	   	title="display network information"><i class="glyphicon glyphicon-globe">
 	 	  	   	</i>&#32;Networks</button>
-	 	  	   </div>
+	 	  	   </div> -->
 		 	   <div class="btn-group">
 		 	   	<button class="btn btn-default"
 		 	   		onclick="javascript:location.href='?vmpage=hostinfo'" 
@@ -63,10 +63,6 @@ Type="xmenu"
 		include('/usr/local/emhttp/plugins/vmMan/addxml.php');
 	elseif($vmpage == 'createvm')
 		include('/usr/local/emhttp/plugins/vmMan/createvm.php');
-	elseif($vmpage == 'editxml')
-		include('/usr/local/emhttp/plugins/vmMan/editxml.php');
-	elseif($vmpage == 'viewxml')
-		include('/usr/local/emhttp/plugins/vmMan/viewxml.php');
 	elseif($vmpage == 'dominfo')
 		include('/usr/local/emhttp/plugins/vmMan/dominfo.php');
 	elseif($vmpage == 'networks')
