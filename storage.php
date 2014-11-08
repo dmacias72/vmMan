@@ -12,10 +12,9 @@
       }    
 	} 
 </script>
-
 	<?php
-		$msg="none";
-		$clear = false;
+	$msg="none";
+	$clear = false;
 	if ($action) {
 		if ($action == 'volume-create') {
 			include('/usr/local/emhttp/plugins/vmMan/createvol.php');
@@ -24,77 +23,83 @@
 			include('/usr/local/emhttp/plugins/vmMan/createpool.php');
 		}
 	}else{
-		if ($subaction == 'volume-delete') {
-			$msg = $lv->storagevolume_delete( base64_decode($_GET['vpath']) ) ? 
-				'Volume has been successfully deleted' : 
-				'Cannot delete volume '.$lv->get_last_error();
-		}
-		elseif ($subaction == 'volume-save') {
-			if (array_key_exists('sent', $_POST)) {
-				$msg = $lv->storagevolume_create($_GET['pool'], $_POST['vname'], $_POST['capacity'], $_POST['allocation'], $_POST['disk_driver']) ?
-					'Volume has been successfully created' : 
-					'Cannot create volume '.$lv->get_last_error();
+		if ($subaction) {
+			if ($subaction == 'volume-delete') {
+				$msg = $lv->storagevolume_delete( base64_decode($_GET['vpath']) ) ? 
+					'Volume has been successfully deleted' : 
+					'Cannot delete volume '.$lv->get_last_error();
 			}
-		}
-  		elseif ($subaction == 'pool-refresh') {
-				$pname = $_GET['pool'];
-				$res = $lv->get_storagepool_res($pname);				
-				$msg = $lv->storagepool_refresh($res) ? 
-					"Storage pool $pname has been successfully refreshed" : 
-					"Cannot refresh storage pool $pname ".$lv->get_last_error();
-		}
-  		elseif ($subaction == 'pool-remove') {
-				$pname = $_GET['pool'];
-				$res = $lv->get_storagepool_res($pname);				
-				if ($lv->storagepool_is_active($res)) 
-					$lv->storagepool_destroy($res);
-				$msg = $lv->storagepool_undefine($res) ? 
-					"Storage pool $pname has been successfully removed" : 
-					"Cannot remove storage pool $pname ".$lv->get_last_error();
-		}
-  		elseif ($subaction == 'pool-stop') {
+			elseif ($subaction == 'volume-save') {
+				if (array_key_exists('sent', $_POST)) {
+					$disk = $_POST['disk'];
+					$msg = $lv->storagevolume_create($_GET['pool'], $disk['name'], $disk['capacity'], $disk['allocation'], $disk['driver']) ?
+						'Volume has been successfully created' : 
+						'Cannot create volume '.$lv->get_last_error();
+				}
+			}
+  			elseif ($subaction == 'pool-refresh') {
+					$pname = $_GET['pool'];
+					$res = $lv->get_storagepool_res($pname);				
+					$msg = $lv->storagepool_refresh($res) ? 
+						"Storage pool $pname has been successfully refreshed" : 
+						"Cannot refresh storage pool $pname ".$lv->get_last_error();
+			}
+  			elseif ($subaction == 'pool-remove') {
+					$pname = $_GET['pool'];
+					$res = $lv->get_storagepool_res($pname);				
+					if ($lv->storagepool_is_active($res)) 
+						$lv->storagepool_destroy($res);
+					$msg = $lv->storagepool_undefine($res) ? 
+						"Storage pool $pname has been successfully removed" : 
+						"Cannot remove storage pool $pname ".$lv->get_last_error();
+			}
+	  		elseif ($subaction == 'pool-stop') {
 				$pname = $_GET['pool'];
 				$res = $lv->get_storagepool_res($pname);				
 				$msg = $lv->storagepool_destroy($res) ? 
 					"Storage pool $pname has been successfully stopped" : 
 					"Cannot stop storage pool $pname ".$lv->get_last_error();
-		}
-		elseif ($subaction == 'pool-start') {
-			if (array_key_exists('sent', $_POST)) {
-				$pname = $_POST['pname'];
-				$ppath = $_POST['ppath'];
-				if (!is_dir($ppath))
-					mkdir($ppath);
-				$puuid = $lv->storagepool_generate_uuid();
-				$xml = "<pool type='dir'>
-						<name>$pname</name>
-						<uuid>$puuid</uuid>
-						<capacity unit='bytes'>0</capacity>
-						<allocation unit='bytes'>0</allocation>
-						<available unit='bytes'>0</available>
-						<source>
-						</source>
-						<target>
-							<path>$ppath</path>
-								<permissions>
-									<mode>0755</mode>
-									<owner>-1</owner>
-									<group>-1</group>
-								</permissions>
-						</target>
-					</pool>";						
-				$res = $lv->storagepool_define_xml($xml);
-				$msg = $lv->storagepool_create($res) ?
-					"Storage pool $pname has been created successfully" : 
-					"Cannot create storage pool $pname ".$lv->get_last_error();
-			} else {
-				$pname = $_GET['pool'];
-				$res = $lv->get_storagepool_res($pname);
-				$msg = $lv->storagepool_create($res) ?
-					"Storage pool $pname has been successfully started" : 
-					"Cannot start storage pool $pname ".$lv->get_last_error();
 			}
-		$clear = true;
+			elseif ($subaction == 'pool-start') {
+				if (array_key_exists('sent', $_POST)) {
+					//storage pool create
+					$pool = $_POST['pool'];
+					$pname = $pool['name'];
+					$ppath = $pool['path'];
+					if (!is_dir($ppath))
+						mkdir($ppath);
+						$puuid = $lv->storagepool_generate_uuid();
+						$xml = "<pool type='dir'>
+							<name>$pname</name>
+							<uuid>$puuid</uuid>
+							<capacity unit='bytes'>0</capacity>
+							<allocation unit='bytes'>0</allocation>
+							<available unit='bytes'>0</available>
+							<source>
+							</source>
+							<target>
+								<path>$ppath</path>
+									<permissions>
+										<mode>0755</mode>
+										<owner>-1</owner>
+										<group>-1</group>
+									</permissions>
+							</target>
+						</pool>";						
+					$res = $lv->storagepool_define_xml($xml);
+					$msg = $lv->storagepool_create($res) ?
+						"Storage pool $pname has been created successfully" : 
+						"Cannot create storage pool $pname ".$lv->get_last_error();
+				} else {
+					//storage pool start
+					$pname = $_GET['pool'];
+					$res = $lv->get_storagepool_res($pname);
+					$msg = $lv->storagepool_create($res) ?
+						"Storage pool $pname has been successfully started" : 
+						"Cannot start storage pool $pname ".$lv->get_last_error();
+				}
+			}
+			$clear = true;
 		}
 				echo "<h3>Storage Pool Information<a href=\"?vmpage=storage&amp;action=pool-create\" title=\"create new storage pool\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h3>
 					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
@@ -155,7 +160,7 @@
 								  <th>Path</th>
 								  <th>Actions</th>
 								</tr>";
-						$tmp = $lv->storagepool_get_volume_information($pools[$i]);
+						$tmp = $lv->storagepool_get_volume_information($pname);
 						$tmp_keys = array_keys($tmp);
 						for ($ii = 0; $ii < sizeof($tmp); $ii++) {
 							$vname = $tmp_keys[$ii];		
@@ -177,6 +182,7 @@
 				}
 			}
 				echo "</table>";
+				// remove actions from url
 		if ($clear) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs?vmpage=storage'); </script>";
 		}
 		?>
