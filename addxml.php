@@ -2,7 +2,7 @@
 	<div class="list">
 	<h3>Create New Domain XML Description</h3>
 		<div>
-			<form method="POST" id="addxml" action="?vmpage=main&amp;action=domain-define" >
+			<form method="POST" id="addxml" action="?subaction=domain-define" >
 				<table>
 					<tr>
 						<td>
