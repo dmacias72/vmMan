@@ -332,7 +332,7 @@
          echo "</table>";
 
 			/* Snapshots  information */
-         echo "<h4><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
+         echo "<h4><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h4><br />";
          	echo "<table class='table table-striped'>
 		        	      <tr>
       	      	   	<th>Number</th>
