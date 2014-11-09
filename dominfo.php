@@ -179,7 +179,7 @@
 	else
      	echo "<a href=\"#\" onClick=\"javascript:location.href='".$pageurl."&amp;action=domain-edit&amp;view='\" 
 		  		title=\"edit domain XML\">$domName</a>";         
-      echo	"</h3><div style=\"width: 60%; float:left\"><b>message:&nbsp;</b>$msg</div><div style=\"width: 38.5%; float:right\">";
+      echo	"</h3><div style=\"width: 59%; float:left\"><b>message:&nbsp;</b>$msg</div><div style=\"width: 40%; float:right\">";
 		// create action buttons
    if ($lv->domain_is_running($res, $name)){
 	echo "<b>Actions: </b><a href=\"".$pageurl."&amp;subaction=domain-pause\" 
