@@ -17,8 +17,8 @@
     		if (strlen($info) > 2)
       		$info[ strlen($info) - 2 ] = ' ';
 
-			echo "<h3>Host Information</h3><br /><br />
-   	      <table class='table table-striped'>
+			echo "<h3>Host Information</h3>
+   	      <table class='tablesorter'>
 	      	  	<tr>
 		  	        	<td>Hypervisor: </td>
   						<td>{$ci['hypervisor_string']}</td>

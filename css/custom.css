@@ -9,11 +9,11 @@
  * Config saved to config.json and https://gist.github.com/296ee4fefe88ff5e3b5b
  */
 /*! normalize.css v3.0.1 | MIT License | git.io/normalize */
-/*html {
+html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-}*/
+}
 body {
   margin: 0;
 }

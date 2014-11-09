@@ -164,7 +164,7 @@
    $wsport = (int)$vncport -200;
 	if ($vncport < 0){
      	$vnc = "";
-     	$wsport= 'N/A';
+     	$vncport= 'auto';
    } else
       $vnc ="<a href=\"#\" onClick=\"window.open('/plugins/vmMan/vnc.html?autoconnect=true&host=".gethostname()."&port=".$wsport.
       "','_blank','scrollbars=yes,resizable=yes'); return false;\" 
@@ -204,7 +204,7 @@
      	echo " | <a href=\"?vmpage=&amp;uuid=$uuid&amp;subaction=domain-undefine\" 
         		 onClick=\"return confirm('Are your sure you want to remove $name?')\" title=\"delete domain definition\"><i class=\"glyphicon glyphicon-remove red\"></i></a>";
       
-   echo "</div><br /><br /><table class=\"table table-striped\">
+   echo "</div><table class=\"table tablesorter\">
      			<tr>
      				<td>
      					<b>Memory max (MB): </b>";
@@ -247,18 +247,20 @@
         	</table>";
 
 			/* Disk device information */
-         echo "<h4><b>Disk devices</b>";
+         echo "<h3><b>Disk devices</b>";
         // if ($state == 'shutoff')
          //	echo '<a href="'.$pageurl.'&action=disk-add" title="add disk device"><i class="glyphicon glyphicon-plus green"></i></a>';
-         	echo "</h4><br />
-            	<table class='table table-striped'>
+         	echo "</h3>
+            	<table class='tablesorter'>
          			<tr>
-                  	<th>Disk device</th>
-                     <th>Storage driver type</th>
-                     <th>Domain device</th>
-                     <th>Disk capacity</th>
-                		<th>Disk allocation</th>
-                 		<th>Actions</th>
+         				<thead>
+                  	<th class=\"header\">Disk device</th>
+                     <th class=\"header\">Storage driver type</th>
+                     <th class=\"header\">Domain device</th>
+                     <th class=\"header\">Disk capacity</th>
+                		<th class=\"header\">Disk allocation</th>
+                 		<th class=\"header\">Actions</th>
+                 		</thead>
                  	</tr>";
 		/* Display domain disks */
          $tmp = $lv->get_disk_stats($domName);
@@ -332,15 +334,17 @@
          echo "</table>";
 
 			/* Snapshots  information */
-         echo "<h4><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h4><br />";
-         	echo "<table class='table table-striped'>
+         echo "<h3><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h3>";
+         	echo "<table class='tablesorter'>
 		        	      <tr>
-      	      	   	<th>Number</th>
-         	       		<th> Name</th>
-         	       		 <th> Date </th>
-         	       		 <th> Time </th>
-                  		<th> Actions </th>
-                  		<th> &nbsp; </th>
+		        	      <thead>
+      	      	   	<th class=\"header\">Number</th>
+         	       		<th class=\"header\"> Name</th>
+         	       		<th class=\"header\"> Date </th>
+         	       		<th class=\"header\"> Time </th>
+                  		<th class=\"header\"> Actions </th>
+                  		<th class=\"header\"> &nbsp; </th>
+                  		</thead>
 	                  </tr>";
          $tmp = $lv->domain_snapshots_list($res); 
          if (!empty($tmp)) {
@@ -373,14 +377,16 @@
      	echo "</table>";
 
 			/* Network interface information */
-         echo "<h4><b>Network devices</b></h4><br />";
-         	echo "<table class='table table-striped'>
+         echo "<h3><b>Network devices</b></h3>";
+         	echo "<table class='tablesorter'>
 		        	      <tr>
-      	      	   	<th>MAC Address</th>
-         	       		<th>NIC Type</th>
-            	         <th>Network</th>
-               	      <th>Network active</th>
-                  		<th>Actions</th>
+		        	      	<thead>
+      	      	   	<th class=\"header\">MAC Address</th>
+         	       		<th class=\"header\">NIC Type</th>
+            	         <th class=\"header\">Network</th>
+               	      <th class=\"header\">Network active</th>
+                  		<th class=\"header\">Actions</th>
+                  		</thead>
 	                  </tr>";
          $tmp = $lv->get_nic_info($res);
          if (!empty($tmp)) {

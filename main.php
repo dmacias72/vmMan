@@ -88,17 +88,19 @@
 	echo "<div class=\"wrap\">
 				<div class=\"list\">
 					<h3>Virtual Machine Information &nbsp;<a href=\"?vmpage=main\" autofocus title=\"refresh state\"><i class=\"glyphicon glyphicon-refresh blue\"></i></a></h3>			
-						<div style=\"width: 60%; float:left\"><b>message:&nbsp;</b>$msg</div><div style=\"width: 39%; float:right\"><b>statistics</b> - {$tmp['total']} <b>domains</b>, {$active} <b>active</b>, {$tmp['inactive']} inactive</div><br /><br />
-					<table class=\"table table-striped\">
+						<div style=\"width: 60%; float:left\"><b>message:&nbsp;</b>$msg</div><div style=\"width: 39%; float:right\"><b>statistics</b> - {$tmp['total']} <b>domains</b>, {$active} <b>active</b>, {$tmp['inactive']} inactive</div>
+					<table class=\"tablesorter\">
   	      			<tr>
-  		          		<th>Name</th>
-   	         	   <th>vCPU</th>
-      	        		<th>RAM</th>
-         	     		<th>Hard Drive(s)</th>
-              			<th>State</th>
-              		 	<th>ID / VNC Port</th>
-              			<th>Auto</th>
-              			<th>Action</th>
+  	      				<thead>
+  		          		<th class=\"header\">Name</th>
+   	         	   <th class=\"header\">vCPU</th>
+      	        		<th class=\"header\">RAM</th>
+         	     		<th class=\"header\">Hard Drive(s)</th>
+              			<th class=\"header\">State</th>
+              		 	<th class=\"header\">ID / VNC Port</th>
+              			<th class=\"header\">Auto</th>
+              			<th class=\"header\">Action</th>
+              			</thead>
             		</tr>";
    //Get domain variables for each domain
 	if (!$lv->get_domains())

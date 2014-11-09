@@ -102,18 +102,20 @@
 			$clear = true;
 		}
 				echo "<h3>Storage Pool Information<a href=\"?vmpage=storage&amp;action=pool-create\" title=\"create new storage pool\"><i class=\"glyphicon glyphicon-plus green\"></i></a></h3>
-					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div><br /><br />
-				<table class=\"table table-striped\">
+					<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div>
+				<table class=\"tablesorter\">
 					<tr>
-						<th><a href=\"?vmpage=storage\">Name</a><th>
-						<th>Activity</th>
-						<th>Volume count</th>
-						<th>State</th>
-						<th>Capacity</th>
-						<th>Allocation</th>
-						<th>Available</th>
-						<th>Path</th>
-						<th>Actions</th>
+						<thead>
+						<th class=\"header\"><a href=\"?vmpage=storage\">Name</a><th>
+						<th class=\"header\">Activity</th>
+						<th class=\"header\">Volume count</th>
+						<th class=\"header\">State</th>
+						<th class=\"header\">Capacity</th>
+						<th class=\"header\">Allocation</th>
+						<th class=\"header\">Available</th>
+						<th class=\"header\">Path</th>
+						<th class=\"header\">Actions</th>
+						</thead>
 		      	</tr>";
 				$pools = $lv->get_storagepools();
 			if(!$pools) 
@@ -151,14 +153,16 @@
 	
 					if ($info['volume_count'] > 0) {
 						echo "<tr id=\"pool$i\" style=\"display: none\">
-								<td colspan=\"10\" style='padding-left: 40px'><br /><br /><table>
+								<td colspan=\"10\" style='padding-left: 40px'><br /><table class\"table tablesorter\">
 								<tr>
-								  <th>Name</th>
-								  <th>Type</th>
-								  <th>Capacity</th>
-								  <th>Allocation</th>
-								  <th>Path</th>
-								  <th>Actions</th>
+								<thead>
+								  <th class=\"header\">Name</th>
+								  <th class=\"header\">Type</th>
+								  <th class=\"header\">Capacity</th>
+								  <th class=\"header\">Allocation</th>
+								  <th class=\"header\">Path</th>
+								  <th class=\"header\">Actions</th>
+								</thead>
 								</tr>";
 						$tmp = $lv->storagepool_get_volume_information($pname);
 						$tmp_keys = array_keys($tmp);

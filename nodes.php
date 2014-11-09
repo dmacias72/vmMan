@@ -27,7 +27,7 @@
 				echo "</div></p>";
 
 				$tmp = $lv->get_node_devices( array_key_exists('cap', $_GET) ? $_GET['cap'] : false );
-				echo "<br /><table class=\"table-striped\">
+				echo "<br /><table class=\"table\">
 					<tr>
 					 <th>Device</th>
 					 <th>Identification</th>
