@@ -6,7 +6,7 @@
 				<table>
 					<tr>
 						<td>
-							<textarea autofocus readonly name="xmldesc" rows="16" cols="90%"><?php echo htmlentities($lv->get_node_device_xml($name, false));?></textarea>
+							<textarea autofocus readonly name="xmldesc" rows="16" cols="100%"><?php echo htmlentities($lv->get_node_device_xml($name, false));?></textarea>
 						</td>
 					</tr>
 					<tr>

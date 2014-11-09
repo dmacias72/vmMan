@@ -27,14 +27,14 @@
 				echo "</div></p>";
 
 				$tmp = $lv->get_node_devices( array_key_exists('cap', $_GET) ? $_GET['cap'] : false );
-				echo "<table class=\"table-striped\">
+				echo "<br /><table class=\"table-striped\">
 					<tr>
-					 <th> Device </th>
-					 <th> Identification </th>
-					 <th> Driver </th>
-					 <th> Vendor </th>
-					 <th> Product </th>
-					 <th> XML </th>
+					 <th>Device</th>
+					 <th>Identification</th>
+					 <th>Driver</th>
+					 <th>Vendor</th>
+					 <th>Product</th>
+					 <th>XML</th>
 					</tr>";
 				//create device node information  and buttons for each device
 				for ($i = 0; $i < sizeof($tmp); $i++) {
@@ -75,7 +75,7 @@
 							<td>$act</td>
 			      		</tr>";
 				}
-				echo "</table>";
+				echo "</table><br />";
 			}
 			?>
 		</div>

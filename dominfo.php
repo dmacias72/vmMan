@@ -137,7 +137,6 @@
 		}
 		$clear = true;
 	}
-	$emulator = $lv->get_domain_emulator($domName);        
 	$ci  = $lv->get_connect_information();
 	$maxcpu = $ci['hypervisor_maxvcpus'];
 	unset($ci);
@@ -156,10 +155,11 @@
 	if ($lv->domain_is_running($res, $name)) {
 	   $mem = number_format($dom['memory'] / 1024, 0, '.', ' ');
 		$balloon = '('.number_format($lv->domain_get_memory_stats($domName)['7'] / 1024, 0, '.', ' ').' MB)';
-	} else
+	} else {
 		$mem = $lv->domain_get_memory($res)/1024;
+		$balloon = "N/A";	
+	}
    $id = $lv->domain_get_id($res);
-   $arch = $lv->domain_get_arch($res);
    $vncport = $lv->domain_get_vnc_port($res);
    $wsport = (int)$vncport -200;
 	if ($vncport < 0){
@@ -207,9 +207,7 @@
    echo "</div><br /><br /><table class=\"table table-striped\">
      			<tr>
      				<td>
-     					<b>Domain type: </b>$domtype<br />
-     					<b>Domain emulator: </b>$emulator<br />
-     					<b>Domain memory max (MB): </b>";
+     					<b>Memory max (MB): </b>";
      					if ($state == 'shutoff') {
      						echo '<select name="memory" onchange="location = this.options[this.selectedIndex].value;" title="define the amount memory">';
         					for ($i = 1; $i <= ($maxmem*2); $i++) {
@@ -222,7 +220,8 @@
 						echo '</select>';
 						} else
      						echo $mem;
-     					echo "&nbsp;&nbsp;$balloon<br />
+     					echo "<br />
+     					<b>Memory balloon (MB): </b>$balloon<br />
      					<b>Number of vCPUs: </b>";
 			/* display and change vcpus */
      		if ($state == 'shutoff'){
@@ -241,9 +240,8 @@
 			echo "</td>
         			<td>
         				<b>Domain state: </b><font color=\"$scolor\">$state<br /></font>
-        				<b>Domain architecture: </b>$arch<br />
         				<b>Domain ID: </b>$id<br />
-        				<b>WS Port: </b>$wsport&nbsp;$vnc<br />
+        				<b>VNC Port: </b>$vncport&nbsp;$vnc<br />
         			</td>
 	     		</tr>
         	</table>";
@@ -256,12 +254,11 @@
             	<table class='table table-striped'>
          			<tr>
                   	<th>Disk device</th>
-                     <th> Storage driver type </th>
-                     <th> Domain device </th>
-                     <th> Disk capacity </th>
-                		<th> Disk allocation </th>
-                 		<th> Physical disk size </th>
-                 		<th> Actions </th>
+                     <th>Storage driver type</th>
+                     <th>Domain device</th>
+                     <th>Disk capacity</th>
+                		<th>Disk allocation</th>
+                 		<th>Actions</th>
                  	</tr>";
 		/* Display domain disks */
          $tmp = $lv->get_disk_stats($domName);
@@ -270,7 +267,6 @@
 				for ($i = 0; $i < sizeof($tmp); $i++) {
             	$capacity = $lv->format_size($tmp[$i]['capacity'], 2);
                $allocation = $lv->format_size($tmp[$i]['allocation'], 2);
-               $physical = $lv->format_size($tmp[$i]['physical'], 2);
                $disk = (array_key_exists('file', $tmp[$i])) ? $tmp[$i]['file'] : $tmp[$i]['partition'];
 					echo "<tr>
 								<td>".basename($disk)."</td>
@@ -278,7 +274,6 @@
                         <td align=\"left\">{$tmp[$i]['device']}</td>
                         <td align=\"left\">$capacity</td>
                         <td align=\"left\">$allocation</td>
-                        <td align=\"left\">$physical</td>
                         <td align=\"left\">N/A</td>
 							</tr>";
 
@@ -291,7 +286,6 @@
 				for ($i = 0; $i < sizeof($tmp); $i++) {
             	$capacity = $lv->format_size($tmp[$i]['capacity'], 2);
                $allocation = $lv->format_size($tmp[$i]['allocation'], 2);
-               $physical = $lv->format_size($tmp[$i]['physical'], 2);
                $disk = (array_key_exists('file', $tmp[$i])) ? $tmp[$i]['file'] : $tmp[$i]['partition'];
 					$dev = $tmp[$i]['device'];
 					echo '<tr>
@@ -322,7 +316,6 @@
                	      <td align=\"left\">{$tmp[$i]['device']}</td>
                         <td align=\"left\">$capacity</td>
                         <td align=\"left\">$allocation</td>
-                        <td align=\"left\">$physical</td>
                         <td align=\"left\">";
 						/* add remove button if shutoff */
                      if ($state == 'shutoff')
@@ -339,7 +332,7 @@
          echo "</table>";
 
 			/* Snapshots  information */
-         echo "<h4><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h4><br />";
+         echo "<h4><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h4>";
          	echo "<table class='table table-striped'>
 		        	      <tr>
       	      	   	<th>Number</th>
@@ -371,7 +364,12 @@
 				}
          }
          else
-         	echo "<tr><td>no snapshots</td></tr>";
+         	echo "<tr><td>no snapshots</td><
+   	                <td align=\"left\">none</td>                               
+   	                <td align=\"left\">N/A</td>                               
+   	                <td align=\"left\">N/A</td>                               
+   	                <td align=\"left\">N/A</td>
+   	            </tr>";                              
      	echo "</table>";
 
 			/* Network interface information */
@@ -379,10 +377,10 @@
          	echo "<table class='table table-striped'>
 		        	      <tr>
       	      	   	<th>MAC Address</th>
-         	       		<th> NIC Type</th>
-            	         <th> Network</th>
-               	      <th> Network active</th>
-                  		<th> Actions </th>
+         	       		<th>NIC Type</th>
+            	         <th>Network</th>
+               	      <th>Network active</th>
+                  		<th>Actions</th>
 	                  </tr>";
          $tmp = $lv->get_nic_info($res);
          if (!empty($tmp)) {
@@ -394,14 +392,19 @@
                   	   <td align=\"left\">{$tmp[$i]['nic_type']}</td>
                      	<td align=\"left\">{$tmp[$i]['network']}</td>
 	                     <td align=\"left\">$netUp</td>
-   	                  <td align=\"left\">none"
-            	         ."</td>                               
+   	                  <td align=\"left\">N/A</td>                               
                	   </tr>";
 				}
          }
          else
-         	echo "<tr><td>no network devices</td></tr>";
-     	echo "</table>";
+         	echo "<tr><td>no network devices</td></tr>
+   	                  <td align=\"left\">&nbsp;</td>                               
+   	                  <td align=\"left\">&nbsp;</td>                               
+   	                  <td align=\"left\">&nbsp;</td>                               
+   	                  <td align=\"left\">none</td>
+   	               </tr>";                              
+
+     	echo "</table><br />";
      	/* remove actions from url */
 	if ($clear) echo "<script type=\"text/javascript\">	window.history.pushState('VMs', 'Title', '/VMs$pageurl'); </script>";
 	if ($refresh) echo '<meta http-equiv="refresh" content="3; url='.$pageurl.'&amp;refresh=true">';

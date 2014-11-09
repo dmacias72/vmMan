@@ -360,7 +360,7 @@
 </table>
 <input type="hidden" name="sent" value="1" />
 </form>
-
+<br />
 <?php
   endif;
 ?>

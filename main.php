@@ -88,17 +88,15 @@
 	echo "<div class=\"wrap\">
 				<div class=\"list\">
 					<h3>Virtual Machine Information &nbsp;<a href=\"?vmpage=main\" autofocus title=\"refresh state\"><i class=\"glyphicon glyphicon-refresh blue\"></i></a></h3>			
-						<div style=\"width: 66%; float:left\"><b>message:&nbsp;</b>$msg</div><div style=\"width: 32%; float:right\"><b>statistics</b> - {$tmp['total']} <b>domains</b>, {$active} <b>active</b>, {$tmp['inactive']} inactive</div><br /><br />
+						<div style=\"width: 60%; float:left\"><b>message:&nbsp;</b>$msg</div><div style=\"width: 39%; float:right\"><b>statistics</b> - {$tmp['total']} <b>domains</b>, {$active} <b>active</b>, {$tmp['inactive']} inactive</div><br /><br />
 					<table class=\"table table-striped\">
   	      			<tr>
   		          		<th>Name</th>
    	         	   <th>CPU#</th>
       	        		<th>RAM</th>
          	     		<th>Hard Drive(s)</th>
-           	   		<th>NICs</th>
-            	  		<th>System</th>
               			<th>State</th>
-              		 	<th>ID / WS Port</th>
+              		 	<th>ID / VNC Port</th>
               			<th>Auto</th>
               			<th>Action</th>
             		</tr>";
@@ -122,10 +120,8 @@
 		else 
         	$scolor = 'Orange';               
       $id = $lv->domain_get_id($res);
-      $arch = $lv->domain_get_arch($res);
       $vncport = $lv->domain_get_vnc_port($res);
       $wsport = (int)$vncport -200;
-		$nics = $lv->get_nic_info($res)[0]['network'];
       if (($diskcnt = $lv->get_disk_count($res)) > 0) {
         	$disks = $diskcnt.' / '.$lv->get_disk_capacity($res);
          $diskdesc = 'Current physical size: '.$lv->get_disk_capacity($res, true);
@@ -135,7 +131,8 @@
       }
 		if ($vncport < 0){
         	$vnc = '-';
-        	$wsport= '-';
+        	$wsport = '-';
+        	$vncport = "auto";
       }else
          $vnc = '/plugins/vmMan/vnc.html?autoconnect=true&host='.gethostname().'&port='.$wsport;
       
@@ -151,10 +148,8 @@
                <td>$cpu</td>
                <td>$mem</td>
                <td title='$diskdesc'>$disks</td>
-               <td>$nics</td>
-               <td>$arch</td>
                <td><font color=\"$scolor\">$state</font></td>
-               <td>$id / $wsport</td>
+               <td>$id / $vncport</td>
                <td><input type=\"checkbox\" title=\"Toggle VM auostart\" $auto onClick=\"javascript:location.href='?subaction=domain-autostart&amp;name=$name'\" ></td><td>";
 				
 		//Domain Action Buttons

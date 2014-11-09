@@ -21,7 +21,7 @@
 				<table>
 					<tr>
 						<td>
-							<textarea autofocus <?=$readonly?> name="xmldesc" rows="16" cols="90%"><?=$xml;?></textarea>
+							<textarea autofocus <?=$readonly?> name="xmldesc" rows="16" cols="50"><?=$xml;?></textarea>
 						</td>
 					</tr>
 					<tr>
