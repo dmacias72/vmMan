@@ -92,7 +92,7 @@
 					<table class=\"table table-striped\">
   	      			<tr>
   		          		<th>Name</th>
-   	         	   <th>CPU#</th>
+   	         	   <th>vCPU</th>
       	        		<th>RAM</th>
          	     		<th>Hard Drive(s)</th>
               			<th>State</th>
