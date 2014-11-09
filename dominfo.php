@@ -244,7 +244,7 @@
         				<b>VNC Port: </b>$vncport&nbsp;$vnc<br />
         			</td>
 	     		</tr>
-        	</table>";
+        	</table><br />";
 
 			/* Disk device information */
          echo "<h3><b>Disk devices</b>";
@@ -331,7 +331,7 @@
 
 				}
          }
-         echo "</table>";
+         echo "</table><br />";
 
 			/* Snapshots  information */
          echo "<h3><b>Snapshots </b><a href=\"".$pageurl."&amp;subaction=snap-create\" title=\"create a snapshot of current domain state\"><i class=\"glyphicon glyphicon-camera \"></i><i class=\"glyphicon glyphicon-plus green\"></i></a></h3>";
@@ -374,7 +374,7 @@
    	                <td align=\"left\">N/A</td>                               
    	                <td align=\"left\">N/A</td>
    	            </tr>";                              
-     	echo "</table>";
+     	echo "</table><br />";
 
 			/* Network interface information */
          echo "<h3><b>Network devices</b></h3>";
