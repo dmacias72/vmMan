@@ -220,8 +220,8 @@
 						echo '</select>';
 						} else
      						echo $mem;
-     					echo "<br />
-     					<b>Memory balloon (MB): </b>$balloon<br />
+     					echo "<br /><br />
+     					<b>Memory balloon (MB): </b>$balloon<br /><br />
      					<b>Number of vCPUs: </b>";
 			/* display and change vcpus */
      		if ($state == 'shutoff'){
@@ -232,16 +232,16 @@
      	   			echo ' selected="selected"';
           		echo ">$i</option>";
            	}
-				echo "</select><br />";
+				echo "</select>";
 			}
 			else 
-				echo $vcpu."&nbsp;&nbsp;&nbsp;($cpused"."s)<br />";
+				echo $vcpu."&nbsp;&nbsp;&nbsp;($cpused"."s)";
 					
 			echo "</td>
         			<td>
-        				<b>Domain state: </b><font color=\"$scolor\">$state<br /></font>
-        				<b>Domain ID: </b>$id<br />
-        				<b>VNC Port: </b>$vncport&nbsp;$vnc<br />
+        				<b>Domain state: </b><font color=\"$scolor\">$state<br /><br /> </font>
+        				<b>Domain ID: </b>$id<br /><br />
+        				<b>VNC Port: </b>$vncport&nbsp;$vnc
         			</td>
 	     		</tr>
         	</table><br />";
