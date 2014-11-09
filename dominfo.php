@@ -364,7 +364,7 @@
 				}
          }
          else
-         	echo "<tr><td>no snapshots</td><
+         	echo "<tr><td>no snapshots</td>
    	                <td align=\"left\">none</td>                               
    	                <td align=\"left\">N/A</td>                               
    	                <td align=\"left\">N/A</td>                               
