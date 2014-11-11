@@ -4,7 +4,7 @@ Menu="Tasks:70"
 Type="xmenu"
 ---
 <link href="/plugins/vmMan/css/custom.css" rel="stylesheet">
-<link type="text/css" rel="stylesheet" href="/webGui/styles/default-fonts.css">
+<link href="/plugins/webGui/style/default_layout.css" rel="stylesheet" type="text/css"></link>
 	  	<p>
 	   	<div class="btn-group btn-group-sm">
   	 	      <div class="btn-group">
