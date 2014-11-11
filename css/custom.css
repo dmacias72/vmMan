@@ -176,7 +176,6 @@ legend {
 }
 textarea {
   overflow: auto;
-  width: 475px;
 }
 optgroup {
   font-weight: bold;
@@ -816,7 +815,7 @@ th {
   -moz-box-sizing: inherit;
   box-sizing: inherit;
 }
-/*html {
+html {
   font-size: 10px;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -826,7 +825,7 @@ body {
   line-height: inherit;
   color: #333333;
   background-color: #ffffff;
-}*/
+}
 input,
 button,
 select,
