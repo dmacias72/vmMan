@@ -166,7 +166,7 @@
         				title=\"Suspend to disk, save domain state\"><i class=\"glyphicon glyphicon-save\"></i></button> | 
         			<button class=\"btn btn-sm btn-danger\" onClick=\"javascript:location.href='?subaction=domain-stop&amp;uuid=$uuid'\" 
         				title=\"safely shutdown domain\"><i class=\"glyphicon glyphicon-stop\"></i></button> | 
-              	<button class=\"btn btn-sm btn-default\" href=\"?subaction=domain-destroy&amp;uuid=$uuid\" 
+              	<button class=\"btn btn-sm btn-default\" href=\"?vmpage=main&amp;subaction=domain-destroy&amp;uuid=$uuid\" 
               		onClick=\"return confirm('Are your sure you want to force shutdown $name?')\" title=\"force domain to shutdown\"><i class=\"glyphicon glyphicon-eject\"></i></button>";
  		}else {
         	if ($state == "paused")
