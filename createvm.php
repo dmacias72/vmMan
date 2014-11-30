@@ -1,8 +1,5 @@
-	<div class="wrap">
-	<div class="list">
 <?php
   $skip = false;
-  $msg = false;
   $pools = $lv->get_storagepools();
   $network_cfg = parse_ini_file( "/boot/config/network.cfg" );
   if (array_key_exists('sent', $_POST)) {
@@ -13,15 +10,16 @@
 		if (array_key_exists('feature_'.$features[$i], $_POST))
 			$feature[] = $features[$i];
 
-	$tmp = $lv->domain_new($_POST['name'], $_POST['media'], $_POST['drivers'], $_POST['cpu_count'], $feature, $_POST['memory'], $_POST['maxmem'], $_POST['clock_offset'], $_POST['nic'], $_POST['disk'], $_POST['usb'], $_POST['usbtab'], $_POST['shares'], $_POST['setup_persistent']);
-	if (!$tmp)
-		$msg = $lv->get_last_error();
-	else {
+	$tmp = $lv->domain_new($_POST['name'], $_POST['desc'], $_POST['media'], $_POST['drivers'], $_POST['cpu_count'], $feature, $_POST['memory'], $_POST['maxmem'], $_POST['clock_offset'], $_POST['nic'], $_POST['disk'], $_POST['usb'], $_POST['usbtab'], $_POST['shares'], $_POST['setup_persistent']);
+	if (!$tmp){
+		echo "<script type='text/javascript'>$(function() { $('#countdown').html('<font color=\"red\">Error: ".$lv->get_last_error()."</font>');}); </script>";
+	} else {
 		$skip = true;
   		$name = $_POST['name'];
 		$res = $lv->get_domain_by_name($name);
 		$uuid = libvirt_domain_get_uuid_string($res);
-		$msg = "New virtual machine <a href=\"?vmpage=dominfo&amp;uuid=$uuid\">$name&nbsp;</a> has been created successfully";
+		echo "<script type='text/javascript'>$(function() { $('#countdown').html('<font color=\"green\">New virtual machine $name&nbsp;</a> has been created successfully</font>');}); </script>";
+		echo '<meta http-equiv="refresh" content="3; url=/KVM">';
 	}
   }
 
@@ -30,13 +28,7 @@
   unset($ci);
   $info = $lv->host_get_node_info();
   $maxmem = number_format(($info['memory'] / 1048576), 0, '.', ' ');
-  if (!$msg)
-	$msg = "none"
 ?>
-
-	<div class="section"><h3>Create a new Virtual Machine</h3></div>
-	<div id="msg"><b>message:&nbsp;</b><?php echo $msg ?></div>
-	<br /><br />
 <?php
     if (!$skip):
 ?>
@@ -97,11 +89,21 @@
 <div id="content">
 
 <form method="POST">
-
-<table id="form-table">
+<table id="form-table"><thead><th class='header'></th><th class="header" align="left"><b>Create New Virtual Machine From Template</b></th></thead>
+<tr>
+	<td>
+	</td>
+	<td>
+	</td>
+</tr>
 <tr>
     <td align="right">Name:&nbsp; </td>
     <td><input type="text" autofocus name="name" title="name of vitual machine" placeholder="name of vitual machine" /></td>
+</tr>
+
+<tr>
+    <td align="right">Description:&nbsp; </td>
+    <td><input type="text" name="desc" title="description of vitual machine" placeholder="description of vitual machine" /></td>
 </tr>
 
 <tr>
@@ -152,7 +154,7 @@
     <td>
       	<input class="checkbox" type="checkbox" value="1" name="feature_apic" title="APIC allows the use of programmable IRQ management" checked="checked" /> APIC<br />
       	<input class="checkbox" type="checkbox" value="1" name="feature_acpi" title="ACPI is for power management, required for graceful shutdown" checked="checked" /> ACPI<br />
-      	<input class="checkbox" type="checkbox" value="1" name="feature_pae" title="Physical address extension mode allows 32-bit guests to address more than 4 GB of memory" checked="checked" /> PAE<br />
+      	<input class="checkbox" type="checkbox" value="1" name="feature_pae" title="Physical address extension mode allows 32-bit guests to address more than 4 GB of memory"/> PAE (check for 32bit OS)<br />
       	<input class="checkbox" type="checkbox" value="1" name="feature_hap" title="Enable use of Hardware Assisted Paging if available in the hardware" /> HAP<br />
 			<input class="checkbox" type="checkbox" value="1" name="usbtab" title="mouse coordinates in vm match the pointer position on the real desktop" checked="checked"/> VNC Mouse (uncheck for OS without desktop)
     </td>
@@ -207,7 +209,7 @@
 <tr id="setup_network" style="display: none">
     <td>&nbsp;</td>
     <td>
-        <table>
+        <table class="tablesorter"  style="margin-top:0px;margin-left:-33px">
 			<tr>
 		   	<td align="right">MAC:&nbsp;</td>
    			<td>
@@ -248,7 +250,7 @@
 <tr id="setup_disk" style="display: table-row">
     <td>&nbsp;</td>
     <td>
-        <table>
+        <table class="tablesorter"  style="margin-top:0px;margin-left:-72px">
 <tr>
 	<td align="right">Disk image:&nbsp;</td>
 	<td>
@@ -301,16 +303,17 @@
 <tr id="setup_usb" style="display: none">
     <td>&nbsp;</td>
     <td>
-        <table>
-
+        <table style="margin-top:0px;margin-left:72px">
 <tr>
 	<td align="left">
 <?php
 	$tmp = $lv->get_node_devices('usb_device');
 	for ($i = 0; $i < sizeof($tmp); $i++) {
 		$tmp2 = $lv->get_node_device_information($tmp[$i]);
+		$vendor = $tmp2['vendor_id'];
+		$product = $tmp2['product_id'];
 		if (array_key_exists('vendor_id', $tmp2) && array_key_exists('product_id', $tmp2) && array_key_exists('product_name', $tmp2))
-			echo '<input class="checkbox" type="checkbox" value="'.$tmp2['vendor_id'].','.$tmp2['product_id'].'" name="usb['.$i.']" />'.$tmp2['product_name'].'<br />';
+			echo '<input class="checkbox" type="checkbox" value="'.$vendor.','.$product.'" name="usb['.$i.']" />'.$vendor.':'.$product.'&nbsp;&nbsp;'.$tmp2['product_name'].'<br />';
     }
 ?>
   	</td>
@@ -332,7 +335,7 @@
 <tr id="setup_shares" style="display: none">
     <td>&nbsp;</td>
     <td>
-        <table>
+        <table class="tablesorter"  style="margin-top:0px;margin-left:-96px">
 <tr>
 	<td align="right">unRAID share:&nbsp;</td>
 	<td>
@@ -360,9 +363,6 @@
 </table>
 <input type="hidden" name="sent" value="1" />
 </form>
-<br />
 <?php
   endif;
 ?>
-	</div>
-</div>
