@@ -1,0 +1,100 @@
+Cond="(pgrep('libvirtd')!==FALSE)"
+Icon="icons/default.png"
+Menu="Tasks:70"
+Type="xmenu"
+---
+<link href="/plugins/vmMan/styles/custom.css" rel="stylesheet">
+<link href="/plugins/webGui/style/default_layout.css" rel="stylesheet" type="text/css">
+<link type="text/css" rel="stylesheet" href="/plugins/vmMan/styles/fileTree.css">
+<script type="text/javascript" src="/plugins/vmMan/scripts/fileTree.js"></script>
+<script>
+function clearHistory(){
+	window.history.pushState('KVM', 'Title', '/KVM');
+}
+
+function toggle_id(itemID){ 
+   // Toggle visibility between none and 'table-row' 
+   if ((document.getElementById(itemID).style.display == 'none')) { 
+      document.getElementById(itemID).style.display = 'table-row' 
+      event.preventDefault()
+   } else { 
+      document.getElementById(itemID).style.display = 'none'; 
+      event.preventDefault()
+   }    
+}
+
+function showInput(){
+    $(this).off('click');
+    $(this).siblings('input').each(function(){$(this).show();});
+    $(this).siblings('input').focus();
+    $(this).hide();
+}
+function hideInput(){
+    $(this).hide();
+    $(this).siblings('span').show();
+    $(this).siblings('span').click(showInput);
+}
+
+$(function(){
+    $('.text').click(showInput);
+    $('.input').blur(hideInput);
+});
+</script>
+<div>	  	<p>
+	   	<div class="btn-group btn-group-sm">
+  	 	      <div class="btn-group">
+  	 	      	<button class="btn btn-success" 
+		 	      	onclick="javascript:location.href='?vmpage=main'" 
+  		 	      	title="main page"><i class="glyphicon glyphicon-home">
+	 	      	</i>&#32;VMs</button>
+	 	      </div>
+	 	      <div class="btn-group">
+	 	      	<button class="btn btn-primary" 
+		 	      	onclick="javascript:location.href='?vmpage=createvm'" 
+		 	      	title="create domain from template"><i class="glyphicon glyphicon-plus">
+	 	      	</i>&#32;Create</button>
+	 	      </div>
+  	   		<div class="btn-group">
+  	   			<button class="btn btn-info"
+ 	  	   			onclick="javascript:location.href='?vmpage=addxml'" 
+	  	  		 		title="add domain from XML"><i class="glyphicon glyphicon-plus">
+	  	   		</i>&#32;XML</button>
+  	   		</div>
+  	   		<div class="btn-group">
+  	   			<button class="btn btn-success"
+ 	  	   			onclick="javascript:location.href='?vmpage=storage'" 
+	  	  		 		title="display storage information"><i class="glyphicon glyphicon-hdd">
+	  	   		</i>&#32;Storage</button>
+  	   		</div>
+		      <div class="btn-group">
+		      	<button class="btn btn-warning"  
+  	  		   	   onclick="javascript:location.href='?vmpage=devices&cap= '" 
+	  		      	title="display device node information"><i class="glyphicon glyphicon-stats">
+	  			   </i>&#32;Devices</button>
+		  	   </div>
+			</div>      	
+     	</p>
+</div>
+<?php
+   //error_reporting(0);
+   require('/usr/local/emhttp/plugins/vmMan/classes/libvirt.php');
+	$uri = 'qemu:///system';
+   $lv = new Libvirt($uri, null, null, false);
+   $vmpage = array_key_exists('vmpage', $_GET) ? $_GET['vmpage'] : '';
+   $action = array_key_exists('action', $_GET) ? $_GET['action'] : '';
+   $subaction = array_key_exists('subaction', $_GET) ? $_GET['subaction'] : '';
+	if($vmpage == 'addxml')
+		include('/usr/local/emhttp/plugins/vmMan/addxml.php');
+	elseif($vmpage == 'createvm')
+		include('/usr/local/emhttp/plugins/vmMan/createvm.php');
+	elseif($vmpage == 'devices')
+		include('/usr/local/emhttp/plugins/vmMan/devices.php');
+	elseif ($vmpage == 'storage')
+		include('/usr/local/emhttp/plugins/vmMan/storage.php');
+	else
+		include('/usr/local/emhttp/plugins/vmMan/main.php');
+?>
+<style type="text/css">
+  #countdown { position: absolute; bottom: 0; left: 0; }
+</style>		
+<span id="countdown" style="margin-bottom:5px"></span>
